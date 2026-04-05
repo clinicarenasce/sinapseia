@@ -20,10 +20,8 @@ def detectar_logseq_graphs():
         os.path.join(home, "Documentos"),
         home,
     ]
-    for letra in "DEF":
-        drive = f"{letra}:\\"
-        if os.path.exists(drive):
-            candidatos.append(drive)
+    from core.platform_utils import drives_extras
+    candidatos.extend(drives_extras())
 
     graphs = []
     visitados = set()

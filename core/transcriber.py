@@ -1,8 +1,8 @@
 import os
 import threading
-import winsound
 from faster_whisper import WhisperModel
 from core.naming import gerar_nome_inteligente, renomear_arquivo
+from core.platform_utils import play_beep
 
 _modelo_whisper = None
 _cancelar_transcricao = False
@@ -75,7 +75,7 @@ def transcrever(audio_path, callbacks):
             novo_audio = renomear_arquivo(audio_path, _nome_inteligente)
             _audio_path_atual = novo_audio
 
-            winsound.MessageBeep(winsound.MB_ICONASTERISK)
+            play_beep()
             callbacks["on_concluido"](_nome_inteligente, _idioma_detectado)
         except Exception as e:
             callbacks["on_erro"](str(e))

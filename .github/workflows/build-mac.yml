@@ -1,0 +1,62 @@
+name: Build macOS DMG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Generate logo.icns
+        run: bash scripts/create-icns.sh
+
+      - name: Build .app with PyInstaller
+        run: |
+          pyinstaller sinapseia-mac.spec
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Create .dmg
+        run: |
+          create-dmg \
+            --volname "Sinapse&IA" \
+            --volicon "web/logo.icns" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "SinapseIA.app" 150 185 \
+            --hide-extension "SinapseIA.app" \
+            --app-drop-link 450 185 \
+            "SinapseIA-mac.dmg" \
+            "dist/SinapseIA.app"
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SinapseIA-mac
+          path: SinapseIA-mac.dmg
+
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SinapseIA-mac.dmg

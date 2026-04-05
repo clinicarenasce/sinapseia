@@ -116,15 +116,8 @@ def _resumo_cbs():
 # --- Helpers that stay in app.py (UI-bound) ---
 
 def _copiar_para_clipboard(texto):
-    try:
-        subprocess.run(["powershell", "-Command", "Set-Clipboard -Value $input"],
-                       input=texto.encode("utf-8"), check=True,
-                       creationflags=subprocess.CREATE_NO_WINDOW)
-    except Exception:
-        try:
-            subprocess.run(["clip"], input=texto.encode("utf-16-le"), check=True)
-        except Exception:
-            pass
+    from core.platform_utils import copiar_para_clipboard
+    copiar_para_clipboard(texto)
 
 
 # --- Exposed functions ---
@@ -252,7 +245,8 @@ def abrir_arquivo(path):
         import webbrowser
         webbrowser.open(path)
     elif path and os.path.exists(path):
-        os.startfile(path)
+        from core.platform_utils import abrir_arquivo as _abrir
+        _abrir(path)
 
 
 @eel.expose

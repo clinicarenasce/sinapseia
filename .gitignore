@@ -32,10 +32,11 @@ env/
 *.m4a
 
 # Build/distribuição
-*.spec
 *.exe
 output/
 dist_build/
+dist/
+build/
 
 # IDEs
 .vscode/

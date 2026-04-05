@@ -1,6 +1,5 @@
 import os
 import threading
-import winsound
 from datetime import datetime
 from tkinter import filedialog, Tk
 from core.config import carregar_config, get_vault_ativo, set_vault_ativo
@@ -8,6 +7,7 @@ from core.ai import groq_gerar, PROMPT_OBSIDIAN
 from core.naming import gerar_nome_inteligente
 from core.storage import salvar_historico
 from core.wikilinks import ler_tags_vault, criar_stubs_wikilinks
+from core.platform_utils import play_beep, drives_extras
 
 _DEFAULT_VAULT = os.path.join(os.path.expanduser("~"), "Desktop")
 
@@ -28,11 +28,7 @@ def detectar_vaults():
         os.path.join(home, "Documentos"),
         home,
     ]
-    # Adicionar drives extras
-    for letra in "DEF":
-        drive = f"{letra}:\\"
-        if os.path.exists(drive):
-            candidatos.append(drive)
+    candidatos.extend(drives_extras())
 
     vaults = []
     visitados = set()
@@ -165,7 +161,7 @@ def formatar_texto_direto(texto, callbacks):
                 callbacks["on_erro"]("O modelo nao retornou texto.")
                 return
 
-            winsound.MessageBeep(winsound.MB_ICONASTERISK)
+            play_beep()
             callbacks["on_texto_direto_concluido"](resultado.strip(), "", nome)
         except Exception as e:
             callbacks["on_erro"](f"Erro: {e}")
