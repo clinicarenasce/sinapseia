@@ -885,8 +885,63 @@ async function finalizarOnboarding(){
     carregarVaults();
 }
 
-window.addEventListener('load',()=>{carregarHistorico();carregarDispositivos();verificarGroqKey();carregarVaults();carregarLogseqGraphs();verificarOnboarding();});
+// ===== BlackHole (macOS loopback) =====
+eel.expose(on_status_blackhole);function on_status_blackhole(m){const el=$('bhStatus');if(el)el.textContent=m;}
+eel.expose(on_blackhole_resultado);function on_blackhole_resultado(ok,erro){
+  $('bhInstBtn').disabled=false;$('bhInstBtn').textContent='Instalar BlackHole';
+  if(ok){
+    $('bhStatus').textContent='';
+    $('bhInstalando').classList.add('hidden');
+    $('bhSucesso').classList.remove('hidden');
+  } else {
+    $('bhStatus').textContent='Erro: '+(erro||'Tente manualmente.');
+  }
+}
+async function verificarBlackHole(){
+  const isMac=navigator.platform.toLowerCase().includes('mac')||navigator.userAgent.includes('Mac');
+  if(!isMac)return;
+  const ok=await eel.verificar_blackhole()();
+  if(!ok)$('bhModal').classList.remove('hidden');
+}
+async function iniciarInstalacaoBH(){
+  $('bhInstBtn').disabled=true;$('bhInstBtn').textContent='Aguarde...';
+  $('bhStatus').textContent='Iniciando...';
+  $('bhInstalando').classList.remove('hidden');
+  $('bhSucesso').classList.add('hidden');
+  await eel.instalar_blackhole_eel()();
+}
+
+window.addEventListener('load',()=>{carregarHistorico();carregarDispositivos();verificarGroqKey();carregarVaults();carregarLogseqGraphs();verificarOnboarding();verificarBlackHole();});
 </script>
+
+<!-- ===== BLACKHOLE MODAL (macOS) ===== -->
+<div id="bhModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(6,15,42,.95);backdrop-filter:blur(8px)">
+<div class="card rounded-2xl p-6 w-full max-w-sm mx-4 space-y-4">
+  <div class="text-center space-y-2">
+    <p class="text-4xl">🎧</p>
+    <h3 class="text-xl font-extrabold text-sn-200">Um passo antes de gravar</h3>
+    <p class="text-sm text-sn-400 leading-relaxed">O macOS não permite capturar o áudio do sistema nativamente. O <strong class="text-sn-200">BlackHole</strong> é um driver gratuito e open-source que resolve isso — sem impacto no desempenho.</p>
+  </div>
+  <div id="bhInstalando" class="hidden text-center space-y-2">
+    <div class="text-2xl animate-pulse">⬇️</div>
+    <p id="bhStatus" class="text-sm text-sn-400">Aguardando...</p>
+  </div>
+  <div id="bhSucesso" class="hidden text-center space-y-2">
+    <p class="text-3xl">✅</p>
+    <p class="text-sm text-sn-200 font-semibold">BlackHole instalado!</p>
+    <p class="text-xs text-sn-400">Reinicie o Mac para ativar a gravação de sistema.</p>
+  </div>
+  <div class="space-y-2">
+    <button id="bhInstBtn" onclick="iniciarInstalacaoBH()" class="w-full py-3 text-sm font-bold rounded-xl text-white" style="background:linear-gradient(135deg,#5B8DEF,#7C3AED)">
+      Instalar BlackHole (grátis)
+    </button>
+    <button onclick="$('bhModal').classList.add('hidden')" class="w-full py-2 text-xs text-sn-500 hover:text-sn-300">
+      Pular por agora (gravação do sistema desativada)
+    </button>
+  </div>
+  <p class="text-center text-xs text-sn-500">Open-source · MIT License · <a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" class="text-sn-400 underline">GitHub</a></p>
+</div>
+</div>
 
 <!-- ===== PRO MODAL ===== -->
 <div id="proModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(6,15,42,.92);backdrop-filter:blur(8px)">

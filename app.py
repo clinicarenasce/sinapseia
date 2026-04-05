@@ -123,6 +123,21 @@ def _copiar_para_clipboard(texto):
 # --- Exposed functions ---
 
 @eel.expose
+def verificar_blackhole():
+    from core.platform_utils import blackhole_instalado
+    return blackhole_instalado()
+
+@eel.expose
+def instalar_blackhole_eel():
+    import threading
+    from core.platform_utils import instalar_blackhole
+    result = {"done": False, "ok": False, "erro": ""}
+    def _run():
+        r = instalar_blackhole(on_status=lambda m: eel.on_status_blackhole(m)())
+        eel.on_blackhole_resultado(r.get("ok", False), r.get("erro", ""))()
+    threading.Thread(target=_run, daemon=True).start()
+
+@eel.expose
 def selecionar_arquivo():
     try:
         root = Tk()
