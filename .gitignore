@@ -54,3 +54,8 @@ desktop.ini
 *.bak
 Novo(a)*
 *_backup.py
+
+# Next.js (web-next)
+web-next/node_modules/
+web-next/.next/
+web-next/out/

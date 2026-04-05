@@ -20,9 +20,12 @@ def _gerar_nome_gravacao():
 
 
 def listar_dispositivos():
+    vistos = set()
     dispositivos = []
-    for s in sc.all_speakers():
-        dispositivos.append({"id": s.id, "nome": s.name})
+    for m in sc.all_microphones(include_loopback=True):
+        if m.name not in vistos:
+            vistos.add(m.name)
+            dispositivos.append({"id": m.id, "nome": m.name})
     return dispositivos
 
 
@@ -47,15 +50,27 @@ def iniciar_gravacao(device_id, callbacks):
         try:
             samplerate = 16000
             frames = []
+            # device_id chega como string do JS; IDs do soundcard sao int ou str
+            def _match(s):
+                try:
+                    return s.id == device_id or str(s.id) == str(device_id) or int(s.id) == int(device_id)
+                except Exception:
+                    return False
+
             if device_id:
-                speaker = next((s for s in sc.all_speakers() if s.id == device_id), None)
+                # Tenta encontrar como microfone primeiro (BlackHole aparece como mic no Mac)
+                mic = next((m for m in sc.all_microphones(include_loopback=True) if _match(m)), None)
+                if mic:
+                    device = mic
+                else:
+                    speaker = next((s for s in sc.all_speakers() if _match(s)), None)
+                    if not speaker:
+                        callbacks["on_erro"]("Dispositivo de audio nao encontrado.")
+                        _gravando = False
+                        return
+                    device = sc.get_microphone(speaker.id, include_loopback=True)
             else:
-                speaker = sc.default_speaker()
-            if not speaker:
-                callbacks["on_erro"]("Dispositivo de audio nao encontrado.")
-                _gravando = False
-                return
-            device = sc.get_microphone(speaker.id, include_loopback=True)
+                device = sc.default_microphone()
             with device.recorder(samplerate=samplerate, channels=1) as rec:
                 while _gravando:
                     if _pausado:
@@ -89,10 +104,12 @@ def pausar_gravacao():
 
 
 def parar_gravacao():
-    global _gravando
+    global _gravando, _gravacao_inicio
     _gravando = False
+    _gravacao_inicio = 0.0
 
 
 def cancelar_gravacao():
-    global _gravando
+    global _gravando, _gravacao_inicio
     _gravando = False
+    _gravacao_inicio = 0.0

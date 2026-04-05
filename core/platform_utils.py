@@ -76,40 +76,104 @@ def blackhole_instalado():
         return False
 
 
+def multi_output_configurado():
+    """Verifica se já existe um Multi-Output Device com BlackHole como saída do sistema."""
+    if _SYS != "Darwin":
+        return True
+    try:
+        result = subprocess.run(
+            ["system_profiler", "SPAudioDataType"],
+            capture_output=True, text=True, timeout=5
+        )
+        output = result.stdout.lower()
+        tem_multi = "multi-output" in output
+        tem_bh_output = False
+        for bloco in output.split("\n\n"):
+            if "default output device: yes" in bloco and "blackhole" in bloco:
+                tem_bh_output = True
+        return tem_multi or tem_bh_output
+    except Exception:
+        return False
+
+
+def criar_multi_output(on_status=None):
+    """Cria Multi-Output Device (BlackHole + saída atual) e define como saída do sistema."""
+    def status(msg):
+        if on_status:
+            on_status(msg)
+
+    if _SYS != "Darwin":
+        return {"ok": False, "erro": "Apenas macOS."}
+
+    script = r"""
+tell application "Audio MIDI Setup"
+    activate
+end tell
+delay 1
+tell application "System Events"
+    tell process "Audio MIDI Setup"
+        -- Clica no botao "+"
+        click button 1 of splitter group 1 of window 1
+        delay 0.5
+        -- Seleciona "Criar Dispositivo de Multiplas Saidas"
+        click menu item 1 of menu 1 of button 1 of splitter group 1 of window 1
+        delay 0.5
+    end tell
+end tell
+"""
+    try:
+        status("Abrindo Audio MIDI Setup...")
+        subprocess.run(["osascript", "-e", script], timeout=10, capture_output=True)
+        return {"ok": True, "manual": True}
+    except Exception as e:
+        return {"ok": False, "erro": str(e)}
+
+
 def instalar_blackhole(on_status=None):
-    """Baixa o .pkg mais recente do BlackHole 2ch via GitHub API e abre o instalador nativo."""
+    """Baixa o .pkg do BlackHole 2ch diretamente e abre o instalador nativo."""
     import urllib.request
     import json
     import tempfile
+
+    FALLBACK_VERSION = "0.6.1"
 
     def status(msg):
         if on_status:
             on_status(msg)
 
+    def url_para_versao(versao):
+        v = versao.lstrip("v")
+        return f"https://existential.audio/downloads/BlackHole2ch-{v}.pkg"
+
     try:
         status("Buscando versão mais recente...")
-        req = urllib.request.Request(
-            "https://api.github.com/repos/ExistentialAudio/BlackHole/releases/latest",
-            headers={"User-Agent": "SinapseIA/1.0"},
-        )
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            release = json.loads(resp.read())
+        versao = FALLBACK_VERSION
+        try:
+            req = urllib.request.Request(
+                "https://api.github.com/repos/ExistentialAudio/BlackHole/releases/latest",
+                headers={"User-Agent": "SinapseIA/1.0"},
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                release = json.loads(resp.read())
+            versao = release.get("tag_name", FALLBACK_VERSION).lstrip("v")
+        except Exception:
+            versao = FALLBACK_VERSION
 
-        pkg_url = None
-        pkg_name = "BlackHole2ch.pkg"
-        for asset in release.get("assets", []):
-            name = asset["name"].lower()
-            if "2ch" in name and name.endswith(".pkg"):
-                pkg_url = asset["browser_download_url"]
-                pkg_name = asset["name"]
-                break
-
-        if not pkg_url:
-            return {"ok": False, "erro": "Instalador nao encontrado na release mais recente."}
-
+        pkg_url = url_para_versao(versao)
+        pkg_name = f"BlackHole2ch-{versao}.pkg"
         tmp_path = os.path.join(tempfile.gettempdir(), pkg_name)
-        status(f"Baixando {pkg_name}...")
-        urllib.request.urlretrieve(pkg_url, tmp_path)
+
+        status(f"Baixando BlackHole {versao}...")
+        req_pkg = urllib.request.Request(
+            pkg_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/octet-stream, */*",
+            },
+        )
+        with urllib.request.urlopen(req_pkg, timeout=60) as resp:
+            with open(tmp_path, "wb") as f:
+                f.write(resp.read())
 
         status("Abrindo instalador...")
         subprocess.run(["open", tmp_path], check=False)
@@ -117,6 +181,68 @@ def instalar_blackhole(on_status=None):
 
     except Exception as e:
         return {"ok": False, "erro": str(e)}
+
+
+def escolher_pasta_nativa(titulo="Escolha uma pasta", initial_dir=None):
+    """Abre dialogo nativo de escolha de pasta. Usa AppleScript no Mac, tkinter nos outros."""
+    if _SYS == "Darwin":
+        script = f'POSIX path of (choose folder with prompt "{titulo}"'
+        if initial_dir and os.path.isdir(initial_dir):
+            script += f' default location POSIX file "{initial_dir}"'
+        script += ")"
+        try:
+            r = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True, text=True, timeout=120,
+            )
+            path = r.stdout.strip().rstrip("/")
+            return path if path and os.path.isdir(path) else None
+        except Exception:
+            return None
+    # Fallback: tkinter
+    from tkinter import Tk, filedialog
+    try:
+        root = Tk(); root.withdraw(); root.attributes("-topmost", True)
+        pasta = filedialog.askdirectory(parent=root, initialdir=initial_dir or "", title=titulo)
+        root.destroy()
+        return pasta if pasta else None
+    except Exception:
+        return None
+
+
+def escolher_arquivo_nativo(titulo="Escolha um arquivo", tipos=None):
+    """Abre dialogo nativo de escolha de arquivo. Usa AppleScript no Mac."""
+    if _SYS == "Darwin":
+        ext_list = []
+        if tipos:
+            for desc, exts in tipos:
+                for e in exts.replace("*.", "").split():
+                    if e not in ext_list:
+                        ext_list.append(e)
+        script = f'POSIX path of (choose file with prompt "{titulo}"'
+        if ext_list:
+            tipo_str = ", ".join(f'"{e}"' for e in ext_list)
+            script += f" of type {{{tipo_str}}}"
+        script += ")"
+        try:
+            r = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True, text=True, timeout=120,
+            )
+            path = r.stdout.strip()
+            return path if path and os.path.exists(path) else None
+        except Exception:
+            return None
+    # Fallback: tkinter
+    from tkinter import Tk, filedialog
+    try:
+        root = Tk(); root.withdraw(); root.attributes("-topmost", True)
+        ft = [(d, e) for d, e in (tipos or [])]
+        path = filedialog.askopenfilename(parent=root, filetypes=ft, title=titulo)
+        root.destroy()
+        return path if path else None
+    except Exception:
+        return None
 
 
 def drives_extras():

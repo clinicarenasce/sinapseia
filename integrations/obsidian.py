@@ -24,10 +24,33 @@ def detectar_vaults():
     candidatos = [
         os.path.join(home, "Desktop"),
         os.path.join(home, "Documents"),
-        os.path.join(home, "OneDrive"),
         os.path.join(home, "Documentos"),
+        os.path.join(home, "OneDrive"),
+        # Mac: iCloud Drive (Obsidian sync nativo)
+        os.path.join(home, "Library", "Mobile Documents", "iCloud~md~obsidian", "Documents"),
+        # Mac: iCloud Drive geral
+        os.path.join(home, "Library", "Mobile Documents", "com~apple~CloudDocs"),
+        # Mac: Google Drive
+        os.path.join(home, "Library", "CloudStorage"),
         home,
     ]
+    # Expandir subpastas do Google Drive / iCloud CloudStorage (até 2 níveis)
+    cloudStorage = os.path.join(home, "Library", "CloudStorage")
+    if os.path.isdir(cloudStorage):
+        try:
+            for drive in os.listdir(cloudStorage):
+                drive_path = os.path.join(cloudStorage, drive)
+                candidatos.append(drive_path)
+                if os.path.isdir(drive_path):
+                    try:
+                        for sub in os.listdir(drive_path):
+                            sub_path = os.path.join(drive_path, sub)
+                            if os.path.isdir(sub_path):
+                                candidatos.append(sub_path)
+                    except PermissionError:
+                        pass
+        except PermissionError:
+            pass
     candidatos.extend(drives_extras())
 
     vaults = []
@@ -169,18 +192,5 @@ def formatar_texto_direto(texto, callbacks):
 
 
 def escolher_pasta_obsidian():
-    try:
-        root = Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        pasta = filedialog.askdirectory(
-            parent=root,
-            initialdir=_get_vault(),
-            title="Escolha a pasta dentro do Obsidian",
-        )
-        root.destroy()
-        if pasta:
-            return pasta
-    except Exception:
-        pass
-    return None
+    from core.platform_utils import escolher_pasta_nativa
+    return escolher_pasta_nativa("Escolha a pasta dentro do Obsidian", _get_vault())

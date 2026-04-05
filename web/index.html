@@ -44,7 +44,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-grad
 .br{background:rgba(239,68,68,.12);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(239,68,68,.2);color:#fca5a5;font-weight:700;transition:all .25s ease;border-radius:14px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(239,68,68,.1)}
 .br::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);pointer-events:none}
 .br:hover{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.15)}.br:active{transform:translateY(0)}
-textarea{background:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:12px;resize:none}textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}textarea::placeholder{color:#5B8DEF;opacity:.4}
+textarea{background:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:12px;resize:none}#textoLivre{resize:vertical;min-height:120px;max-height:none;overflow-y:auto}textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}textarea::placeholder{color:#5B8DEF;opacity:.4}
 input[type="text"],input[type="password"]{background:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:8px}input:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}
 select{background-color:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235B8DEF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}select:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}
 .toast{animation:slideIn .3s ease-out,fadeOut .3s ease-in 2.7s}@keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes fadeOut{from{opacity:1}to{opacity:0}}
@@ -199,7 +199,7 @@ select{background-color:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);
 
     <!-- Painel texto -->
     <div id="painelTexto" class="hidden space-y-3 fi">
-        <textarea id="textoLivre" rows="6" class="w-full p-4 text-sm leading-relaxed" placeholder="Cole ou digite o texto que deseja transformar em nota do Obsidian..." oninput="checarTextoLivre()"></textarea>
+        <textarea id="textoLivre" rows="6" class="w-full p-4 text-sm leading-relaxed" placeholder="Cole ou digite o texto que deseja transformar em nota do Obsidian..." style="min-height:120px;resize:vertical;overflow-y:auto;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';checarTextoLivre()"></textarea>
         <button id="btnFormatarTexto" onclick="formatarTextoDireto()" class="hidden w-full py-3 text-sm btn-obsidian-primary fi">&#129504; Formatar para Obsidian</button>
     </div>
 </div>
@@ -314,7 +314,7 @@ select{background-color:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);
     </div>
     <div class="mb-4">
         <div class="flex items-center justify-between mb-2"><span class="text-xs text-sn-400 font-bold uppercase tracking-wider">Resultado</span><span id="cc" class="text-xs text-sn-500 opacity-60"></span></div>
-        <textarea id="txRes" rows="8" class="w-full p-4 text-sm font-mono leading-relaxed"></textarea>
+        <textarea id="txRes" rows="8" class="w-full p-4 text-sm font-mono leading-relaxed" oninput="entrarModoEdicao()"></textarea>
     </div>
     <div id="actBtns" class="grid grid-cols-5 gap-2 mb-3">
         <button onclick="copiarTexto()" class="bo py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#128203;</span>Copiar</button>
@@ -585,6 +585,13 @@ eel.expose(on_salvar_obs_concluido);function on_salvar_obs_concluido(path,nome){
 
 function abrirNotaSalva(){if(obsPath)eel.abrir_arquivo(obsPath)();else if(txtPath)eel.abrir_arquivo(txtPath)();}
 
+function entrarModoEdicao(){
+    if(!$('editBtns').classList.contains('hidden')) return;
+    $('actBtns').classList.add('hidden');
+    $('platformSave').classList.add('hidden');
+    $('delBox').classList.add('hidden');
+    $('editBtns').classList.remove('hidden');
+}
 function voltarEditar(){
     show('S4');
     $('actBtns').classList.add('hidden');
@@ -702,7 +709,7 @@ eel.expose(on_nivel_audio);function on_nivel_audio(n){vH.push(n);if(vH.length>vB
 
 async function iniciarGravacao(){const d=$('deviceSelect').value;if(!d){toast('Nenhum dispositivo de audio disponivel.','warn');return;}grav=true;show('S1');vH=new Array(vBars.length).fill(0);$('recTimer').textContent='00:00';rInt=setInterval(async()=>{const s=await eel.get_tempo_gravacao()();$('recTimer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},1000);await eel.iniciar_gravacao(d)();}
 async function pausarGravacao(){const p=await eel.pausar_gravacao()();$('piIco').innerHTML=p?'&#9654;':'&#9208;';$('piTxt').textContent=p?'Retomar':'Pausar';}
-async function pararGravacao(){grav=false;clearInterval(rInt);await eel.parar_gravacao()();}
+async function pararGravacao(){grav=false;clearInterval(rInt);await eel.parar_gravacao()();toast('Processando audio...','warn');}
 async function cancelarGravacao(){grav=false;clearInterval(rInt);await eel.cancelar_gravacao()();show('S0');toast('Gravacao cancelada.','warn');}
 eel.expose(on_gravacao_concluida);function on_gravacao_concluida(p,n){audioPath=p;show('S0');$('arquivoNome').innerHTML='&#127908; '+esc(n);$('arquivoInfo').classList.remove('hidden');$('arquivoInfo').classList.add('fi');$('painelGravar').classList.add('hidden');toast('Gravacao salva! Clique em Transcrever.','success');}
 
@@ -877,9 +884,13 @@ function onboardingNext(step){
     $('ob'+step).classList.remove('hidden');
 }
 async function finalizarOnboarding(){
-    const k=$('obGroqKey').value.trim();
-    if(k)await eel.salvar_groq_key(k)();
-    await eel.mark_onboarding_done()();
+    try {
+        const k=$('obGroqKey').value.trim();
+        if(k) await eel.salvar_groq_key(k)();
+        await eel.mark_onboarding_done()();
+    } catch(e) {
+        console.error('finalizarOnboarding erro:', e);
+    }
     $('onboarding').classList.add('hidden');
     verificarGroqKey();
     carregarVaults();
@@ -910,6 +921,9 @@ async function iniciarInstalacaoBH(){
   $('bhSucesso').classList.add('hidden');
   await eel.instalar_blackhole_eel()();
 }
+async function abrirAudioMIDI(){
+  await eel.abrir_audio_midi_setup()();
+}
 
 window.addEventListener('load',()=>{carregarHistorico();carregarDispositivos();verificarGroqKey();carregarVaults();carregarLogseqGraphs();verificarOnboarding();verificarBlackHole();});
 </script>
@@ -917,29 +931,62 @@ window.addEventListener('load',()=>{carregarHistorico();carregarDispositivos();v
 <!-- ===== BLACKHOLE MODAL (macOS) ===== -->
 <div id="bhModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(6,15,42,.95);backdrop-filter:blur(8px)">
 <div class="card rounded-2xl p-6 w-full max-w-sm mx-4 space-y-4">
-  <div class="text-center space-y-2">
-    <p class="text-4xl">🎧</p>
-    <h3 class="text-xl font-extrabold text-sn-200">Um passo antes de gravar</h3>
-    <p class="text-sm text-sn-400 leading-relaxed">O macOS não permite capturar o áudio do sistema nativamente. O <strong class="text-sn-200">BlackHole</strong> é um driver gratuito e open-source que resolve isso — sem impacto no desempenho.</p>
+
+  <!-- Passo 1: Instalar BlackHole -->
+  <div id="bhStep1">
+    <div class="text-center space-y-2">
+      <p class="text-4xl">🎧</p>
+      <h3 class="text-xl font-extrabold text-sn-200">Passo 1 de 2 — Instalar BlackHole</h3>
+      <p class="text-sm text-sn-400 leading-relaxed">Driver gratuito que permite capturar o áudio do sistema no Mac.</p>
+    </div>
+    <div id="bhInstalando" class="hidden text-center space-y-2 mt-3">
+      <div class="text-2xl animate-pulse">⬇️</div>
+      <p id="bhStatus" class="text-sm text-sn-400">Baixando...</p>
+    </div>
+    <div id="bhSucesso" class="hidden text-center space-y-2 mt-3">
+      <p class="text-3xl">✅</p>
+      <p class="text-sm text-sn-200 font-semibold">Instalador baixado!</p>
+      <p class="text-xs text-sn-400">Instale o pacote e reinicie o Mac. Depois volte aqui.</p>
+    </div>
+    <div class="space-y-2 mt-4">
+      <button id="bhInstBtn" onclick="iniciarInstalacaoBH()" class="w-full py-3 text-sm font-bold rounded-xl text-white" style="background:linear-gradient(135deg,#5B8DEF,#7C3AED)">
+        Instalar BlackHole (grátis)
+      </button>
+      <button onclick="$('bhStep1').classList.add('hidden');$('bhStep2').classList.remove('hidden')" class="w-full py-2 text-xs text-sn-400 hover:text-sn-200">
+        Já instalei → Próximo passo
+      </button>
+      <button onclick="$('bhModal').classList.add('hidden')" class="w-full py-2 text-xs text-sn-500 hover:text-sn-300">
+        Pular (gravar microfone apenas)
+      </button>
+    </div>
   </div>
-  <div id="bhInstalando" class="hidden text-center space-y-2">
-    <div class="text-2xl animate-pulse">⬇️</div>
-    <p id="bhStatus" class="text-sm text-sn-400">Aguardando...</p>
+
+  <!-- Passo 2: Configurar Multi-Output Device -->
+  <div id="bhStep2" class="hidden space-y-3">
+    <div class="text-center space-y-1">
+      <p class="text-4xl">🔊</p>
+      <h3 class="text-xl font-extrabold text-sn-200">Passo 2 de 2 — Rotear o áudio</h3>
+      <p class="text-sm text-sn-400">Para capturar o som do Mac, crie um <strong class="text-sn-200">Multi-Output Device</strong> no Audio MIDI Setup.</p>
+    </div>
+    <div class="rounded-xl p-3 space-y-2 text-xs text-sn-300" style="background:rgba(91,141,239,.08)">
+      <p>1. Clique em <strong class="text-sn-200">"Abrir Audio MIDI Setup"</strong> abaixo</p>
+      <p>2. Clique no <strong class="text-sn-200">"+"</strong> → <em>Criar Dispositivo de Múltiplas Saídas</em></p>
+      <p>3. Marque <strong class="text-sn-200">BlackHole 2ch</strong> e sua caixa de som</p>
+      <p>4. Clique com o botão direito → <strong class="text-sn-200">Usar como saída de som do sistema</strong></p>
+    </div>
+    <div class="space-y-2">
+      <button onclick="abrirAudioMIDI()" class="w-full py-3 text-sm font-bold rounded-xl text-white" style="background:linear-gradient(135deg,#5B8DEF,#7C3AED)">
+        Abrir Audio MIDI Setup
+      </button>
+      <button onclick="$('bhModal').classList.add('hidden')" class="w-full py-2 text-xs text-sn-400 hover:text-sn-200">
+        Já configurei — Fechar
+      </button>
+      <button onclick="$('bhStep2').classList.add('hidden');$('bhStep1').classList.remove('hidden')" class="w-full py-2 text-xs text-sn-500 hover:text-sn-300">
+        ← Voltar
+      </button>
+    </div>
   </div>
-  <div id="bhSucesso" class="hidden text-center space-y-2">
-    <p class="text-3xl">✅</p>
-    <p class="text-sm text-sn-200 font-semibold">BlackHole instalado!</p>
-    <p class="text-xs text-sn-400">Reinicie o Mac para ativar a gravação de sistema.</p>
-  </div>
-  <div class="space-y-2">
-    <button id="bhInstBtn" onclick="iniciarInstalacaoBH()" class="w-full py-3 text-sm font-bold rounded-xl text-white" style="background:linear-gradient(135deg,#5B8DEF,#7C3AED)">
-      Instalar BlackHole (grátis)
-    </button>
-    <button onclick="$('bhModal').classList.add('hidden')" class="w-full py-2 text-xs text-sn-500 hover:text-sn-300">
-      Pular por agora (gravação do sistema desativada)
-    </button>
-  </div>
-  <p class="text-center text-xs text-sn-500">Open-source · MIT License · <a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" class="text-sn-400 underline">GitHub</a></p>
+
 </div>
 </div>
 

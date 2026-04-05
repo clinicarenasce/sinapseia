@@ -172,19 +172,5 @@ def formatar_texto_direto_logseq(texto, callbacks):
 
 def escolher_pasta_logseq():
     """Opens folder picker starting from active Logseq graph."""
-    try:
-        root = Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        initial = get_logseq_graph() or os.path.expanduser("~")
-        pasta = filedialog.askdirectory(
-            parent=root,
-            initialdir=initial,
-            title="Escolha a pasta dentro do Logseq",
-        )
-        root.destroy()
-        if pasta:
-            return pasta
-    except Exception:
-        pass
-    return None
+    from core.platform_utils import escolher_pasta_nativa
+    return escolher_pasta_nativa("Escolha a pasta dentro do Logseq", get_logseq_graph() or os.path.expanduser("~"))

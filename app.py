@@ -3,8 +3,6 @@ import os
 import re
 import subprocess
 from datetime import datetime
-from tkinter import filedialog, Tk
-
 from core.config import salvar_groq_key as _salvar_groq_key, tem_groq_key as _tem_groq_key
 from core.storage import carregar_historico as _carregar_historico, salvar_historico
 from core.transcriber import (
@@ -138,25 +136,28 @@ def instalar_blackhole_eel():
     threading.Thread(target=_run, daemon=True).start()
 
 @eel.expose
+def verificar_multi_output():
+    from core.platform_utils import multi_output_configurado
+    return multi_output_configurado()
+
+@eel.expose
+def abrir_audio_midi_setup():
+    import subprocess
+    subprocess.run(["open", "-a", "Audio MIDI Setup"], check=False)
+    return True
+
+@eel.expose
 def selecionar_arquivo():
-    try:
-        root = Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        path = filedialog.askopenfilename(
-            parent=root,
-            filetypes=[
-                ("Audio, Video e Legendas", "*.mp3 *.mp4 *.m4a *.wav *.ogg *.mkv *.srt *.vtt *.ass *.ssa *.sub *.sbv *.txt"),
-                ("Audio e Video", "*.mp3 *.mp4 *.m4a *.wav *.ogg *.mkv"),
-                ("Legendas", "*.srt *.vtt *.ass *.ssa *.sub *.sbv"),
-                ("Texto", "*.txt"),
-            ],
-        )
-        root.destroy()
-        if path:
-            return {"path": path, "nome": os.path.basename(path)}
-    except Exception:
-        pass
+    from core.platform_utils import escolher_arquivo_nativo
+    tipos = [
+        ("Audio, Video e Legendas", "*.mp3 *.mp4 *.m4a *.wav *.ogg *.mkv *.srt *.vtt *.ass *.ssa *.sub *.sbv *.txt"),
+        ("Audio e Video", "*.mp3 *.mp4 *.m4a *.wav *.ogg *.mkv"),
+        ("Legendas", "*.srt *.vtt *.ass *.ssa *.sub *.sbv"),
+        ("Texto", "*.txt"),
+    ]
+    path = escolher_arquivo_nativo("Selecione um arquivo", tipos)
+    if path:
+        return {"path": path, "nome": os.path.basename(path)}
     return None
 
 
@@ -465,5 +466,36 @@ def mark_onboarding_done():
 
 # --- Start ---
 
+def _on_close(page, sockets):
+    """Encerra o processo quando todas as abas fecham."""
+    if not sockets:
+        import sys
+        sys.exit(0)
+
+
+def _kill_port(port):
+    """Mata processos usando a porta (evita EADDRINUSE ao reiniciar)."""
+    import signal
+    try:
+        result = subprocess.run(
+            ["lsof", "-ti", f":{port}"],
+            capture_output=True, text=True, timeout=3,
+        )
+        for pid in result.stdout.strip().split("\n"):
+            pid = pid.strip()
+            if pid and pid.isdigit() and int(pid) != os.getpid():
+                os.kill(int(pid), signal.SIGTERM)
+    except Exception:
+        pass
+
+
 if __name__ == "__main__":
-    eel.start("index.html", size=(750, 780), mode="chrome", port=0)
+    _kill_port(8178)
+    eel.start(
+        "index.html",
+        size=(750, 780),
+        mode="default",
+        port=8178,
+        close_callback=_on_close,
+        shutdown_delay=3.0,
+    )
