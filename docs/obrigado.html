@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Compra confirmada — Sinapse&IA Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: { 900:'#060F2A', 800:'#0A1628', 700:'#0F2040' },
+        blue: { 400:'#8FB2FF', 500:'#5B8DEF' },
+        purple: { 400:'#c4b5fd', 600:'#7C3AED' },
+      }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body{font-family:'Inter',sans-serif}
+.gradient-text{background:linear-gradient(135deg,#8FB2FF,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.card-glass{background:rgba(15,32,64,.6);backdrop-filter:blur(20px);border:1px solid rgba(91,141,239,.15);border-radius:16px}
+.btn-primary{background:linear-gradient(135deg,#5B8DEF,#7C3AED);transition:all .2s;border-radius:12px;font-weight:700}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(91,141,239,.35)}
+.step-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5B8DEF,#7C3AED);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+@keyframes pop{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .5s ease forwards}
+</style>
+</head>
+<body class="bg-navy-800 text-slate-200 min-h-screen flex flex-col">
+
+<!-- NAVBAR minimal -->
+<nav class="border-b border-white/5 px-6 h-14 flex items-center" style="background:rgba(6,15,42,.8)">
+  <div class="flex items-center gap-2 font-bold">
+    <span>🧠</span>
+    <span class="gradient-text">Sinapse&IA</span>
+  </div>
+</nav>
+
+<main class="flex-1 flex items-center justify-center px-6 py-16">
+  <div class="max-w-xl w-full">
+
+    <!-- CHECK ANIMADO -->
+    <div class="text-center mb-10">
+      <div class="text-7xl pop mb-4">✅</div>
+      <h1 class="text-4xl font-black mb-2">Compra confirmada!</h1>
+      <p class="text-slate-400 text-lg">Sua licença Pro foi gerada e enviada para o seu email.</p>
+    </div>
+
+    <!-- INFO EMAIL -->
+    <div class="card-glass p-6 mb-6 flex gap-4 items-start">
+      <div class="text-3xl">📧</div>
+      <div>
+        <h3 class="font-bold mb-1">Verifique sua caixa de entrada</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+          Em alguns minutos você receberá um email com sua chave no formato
+          <code class="text-blue-400 font-mono">SINAPSE-XXXX-XXXX-XXXX</code>.
+          Verifique também a pasta de spam.
+        </p>
+      </div>
+    </div>
+
+    <!-- PRÓXIMOS PASSOS -->
+    <div class="card-glass p-6 mb-8">
+      <h3 class="font-bold text-lg mb-5">Próximos passos</h3>
+      <div class="space-y-5">
+        <div class="flex items-start gap-4">
+          <div class="step-num">1</div>
+          <div>
+            <p class="font-semibold">Baixe o Sinapse&IA</p>
+            <p class="text-slate-400 text-sm mt-1">Clique no botão abaixo e instale no seu Windows 10/11.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="step-num">2</div>
+          <div>
+            <p class="font-semibold">Abra o app e vá em Configurações ⚙️</p>
+            <p class="text-slate-400 text-sm mt-1">Clique no ícone de engrenagem no canto superior direito.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="step-num">3</div>
+          <div>
+            <p class="font-semibold">Ative seu plano Pro</p>
+            <p class="text-slate-400 text-sm mt-1">Clique em "Ativar Pro", cole a chave do email e confirme.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="step-num">4</div>
+          <div>
+            <p class="font-semibold">Conecte seu segundo cérebro 🧠</p>
+            <p class="text-slate-400 text-sm mt-1">Configure Obsidian, Logseq ou Notion e comece a gravar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTÃO DOWNLOAD -->
+    <a href="https://github.com/clinicarenasce/sinapseia/releases/latest"
+       class="btn-primary px-8 py-4 text-lg text-white text-center block w-full mb-4">
+      💾 Baixar Sinapse&IA
+    </a>
+
+    <a href="https://clinicarenasce.github.io/sinapseia/"
+       class="block text-center text-slate-500 text-sm hover:text-slate-400 transition-colors">
+      ← Voltar para o site
+    </a>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-6 px-6 text-center text-slate-500 text-sm">
+  Problema com sua licença?
+  <a href="mailto:contato@clinicarenasce.com.br" class="text-blue-400 hover:underline ml-1">
+    contato@clinicarenasce.com.br
+  </a>
+</footer>
+
+</body>
+</html>

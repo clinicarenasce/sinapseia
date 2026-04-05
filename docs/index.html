@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sinapse&IA — Transforme o que você aprende em conhecimento permanente</title>
+<meta name="description" content="Transcreva qualquer áudio e organize automaticamente no seu segundo cérebro com IA. Integra com Obsidian, Logseq e Notion."/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        navy: { 900:'#060F2A', 800:'#0A1628', 700:'#0F2040', 600:'#152850' },
+        blue: { 400:'#8FB2FF', 500:'#5B8DEF', 600:'#3B6FD4' },
+        purple: { 400:'#c4b5fd', 500:'#a78bfa', 600:'#7C3AED' },
+        gold: '#FFD54F',
+      },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+html{scroll-behavior:smooth}
+.gradient-text{background:linear-gradient(135deg,#8FB2FF,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.card-glass{background:rgba(15,32,64,.6);backdrop-filter:blur(20px);border:1px solid rgba(91,141,239,.15);border-radius:16px}
+.btn-primary{background:linear-gradient(135deg,#5B8DEF,#7C3AED);transition:all .2s;border-radius:12px;font-weight:700}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(91,141,239,.35)}
+.btn-outline{border:1.5px solid rgba(91,141,239,.4);color:#8FB2FF;border-radius:12px;font-weight:600;transition:all .2s}
+.btn-outline:hover{background:rgba(91,141,239,.1);border-color:#8FB2FF}
+.shimmer{background:linear-gradient(90deg,rgba(91,141,239,.05) 0%,rgba(91,141,239,.12) 50%,rgba(91,141,239,.05) 100%);background-size:200% 100%;animation:shimmer 2s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.badge-off{background:rgba(255,213,79,.15);border:1px solid rgba(255,213,79,.3);color:#FFD54F;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+</style>
+</head>
+<body class="bg-navy-800 text-slate-200 font-sans antialiased">
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5" style="background:rgba(6,15,42,.85);backdrop-filter:blur(20px)">
+  <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-2 font-bold text-lg">
+      <span class="text-2xl">🧠</span>
+      <span class="gradient-text">Sinapse&IA</span>
+    </div>
+    <a href="https://github.com/clinicarenasce/sinapseia/releases/latest"
+       class="btn-outline px-4 py-2 text-sm hidden sm:block">
+      Baixar grátis
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-32 pb-24 px-6 text-center relative overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(91,141,239,.12),transparent)"></div>
+  <div class="max-w-3xl mx-auto relative">
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6" style="background:rgba(91,141,239,.1);border:1px solid rgba(91,141,239,.2);color:#8FB2FF">
+      🚀 Whisper local + Groq LLaMA 3 — 100% privado
+    </div>
+    <h1 class="text-5xl sm:text-6xl font-black leading-tight mb-6">
+      Pare de perder<br/>
+      <span class="gradient-text">o que você aprende.</span>
+    </h1>
+    <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Transcreva qualquer aula, reunião ou podcast e transforme em nota estruturada para o seu segundo cérebro — com um clique.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://github.com/clinicarenasce/sinapseia/releases/latest"
+         class="btn-primary px-8 py-4 text-lg text-white inline-block">
+        Começar grátis →
+      </a>
+      <a href="#pricing" class="btn-outline px-8 py-4 text-lg inline-block">
+        Ver plano Pro
+      </a>
+    </div>
+    <p class="text-sm text-slate-500 mt-4">Grátis para sempre · Sem cartão · Windows 10/11</p>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="py-20 px-6">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">Você reconhece esse ciclo?</h2>
+    <p class="text-slate-400 text-center mb-12">A maioria das pessoas perde 90% do que consome em menos de 48h.</p>
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div class="card-glass p-6">
+        <div class="text-4xl mb-4">📓</div>
+        <h3 class="font-bold text-lg mb-2 text-slate-100">Anotações bagunçadas</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Cadernos cheios de texto solto que você nunca mais vai ler. Sem estrutura, sem conexões.</p>
+      </div>
+      <div class="card-glass p-6">
+        <div class="text-4xl mb-4">⏳</div>
+        <h3 class="font-bold text-lg mb-2 text-slate-100">Horas re-consumindo</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Assistir de novo para lembrar o que foi dito. Tempo que poderia ser usado para aplicar.</p>
+      </div>
+      <div class="card-glass p-6">
+        <div class="text-4xl mb-4">🕳️</div>
+        <h3 class="font-bold text-lg mb-2 text-slate-100">Segundo cérebro no papel</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">A promessa do Obsidian/Notion que nunca se concretizou por falta de tempo para organizar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="py-20 px-6" style="background:rgba(15,32,64,.4)">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">Como funciona</h2>
+    <p class="text-slate-400 text-center mb-12">3 passos. Menos de 2 minutos.</p>
+    <div class="grid sm:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background:rgba(91,141,239,.15);border:1px solid rgba(91,141,239,.25)">🎙️</div>
+        <div class="text-blue-400 font-bold text-sm mb-2 uppercase tracking-wide">Passo 1</div>
+        <h3 class="font-bold text-lg mb-2">Grave ou importe</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Capture o som do PC, importe um arquivo de áudio, cole uma legenda ou escreva direto.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25)">🤖</div>
+        <div class="text-purple-400 font-bold text-sm mb-2 uppercase tracking-wide">Passo 2</div>
+        <h3 class="font-bold text-lg mb-2">Transcreva com Whisper</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">O modelo roda 100% local no seu PC. Nenhum áudio sai da sua máquina.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background:rgba(255,213,79,.1);border:1px solid rgba(255,213,79,.2)">🧠</div>
+        <div class="font-bold text-sm mb-2 uppercase tracking-wide" style="color:#FFD54F">Passo 3</div>
+        <h3 class="font-bold text-lg mb-2">Formate e salve</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">O Groq LLaMA 3 estrutura a nota com YAML, [[wikilinks]] e tags. Um clique salva no Obsidian.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-20 px-6">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">Tudo que você precisa</h2>
+    <p class="text-slate-400 text-center mb-12">Construído para quem leva o segundo cérebro a sério.</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">🔒</div>
+        <h4 class="font-bold mb-1">Whisper local</h4>
+        <p class="text-slate-400 text-sm">Transcrição offline. Seus áudios nunca saem do PC.</p>
+      </div>
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">✨</div>
+        <h4 class="font-bold mb-1">Groq LLaMA 3</h4>
+        <p class="text-slate-400 text-sm">Formatação inteligente em segundos com o modelo mais rápido disponível.</p>
+      </div>
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">🔗</div>
+        <h4 class="font-bold mb-1">[[Wikilinks]] automáticos</h4>
+        <p class="text-slate-400 text-sm">Conecta conceitos automaticamente dentro do seu vault.</p>
+      </div>
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">🏷️</div>
+        <h4 class="font-bold mb-1">Tags contextuais</h4>
+        <p class="text-slate-400 text-sm">Lê suas tags existentes e reutiliza antes de criar novas.</p>
+      </div>
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">🗓️</div>
+        <h4 class="font-bold mb-1">Revisão semanal</h4>
+        <p class="text-slate-400 text-sm">IA que sintetiza suas notas da semana e aponta conexões.</p>
+      </div>
+      <div class="card-glass p-5">
+        <div class="text-2xl mb-3">🔌</div>
+        <h4 class="font-bold mb-1">Multi-plataforma</h4>
+        <p class="text-slate-400 text-sm">Obsidian, Logseq, Notion e Roam — você escolhe onde salvar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="py-20 px-6" style="background:rgba(15,32,64,.4)">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-4">Planos simples, sem surpresa</h2>
+    <p class="text-slate-400 text-center mb-12">Comece grátis. Evolua quando precisar de mais integrações.</p>
+
+    <div class="grid sm:grid-cols-2 gap-6">
+      <!-- GRATUITO -->
+      <div class="card-glass p-8 flex flex-col">
+        <h3 class="font-bold text-xl mb-1">Gratuito</h3>
+        <p class="text-slate-400 text-sm mb-6">Para começar seu segundo cérebro</p>
+        <div class="text-4xl font-black mb-6">R$0</div>
+        <ul class="space-y-3 text-sm text-slate-300 flex-1 mb-8">
+          <li class="flex gap-2"><span class="text-green-400">✓</span> Transcrição ilimitada (Whisper)</li>
+          <li class="flex gap-2"><span class="text-green-400">✓</span> Formatação com IA (Groq)</li>
+          <li class="flex gap-2"><span class="text-green-400">✓</span> Integração Obsidian</li>
+          <li class="flex gap-2"><span class="text-green-400">✓</span> Histórico de notas</li>
+          <li class="flex gap-2"><span class="text-slate-600">✗</span> <span class="text-slate-500">Logseq / Notion / Roam</span></li>
+          <li class="flex gap-2"><span class="text-slate-600">✗</span> <span class="text-slate-500">Revisão semanal com IA</span></li>
+        </ul>
+        <a href="https://github.com/clinicarenasce/sinapseia/releases/latest"
+           class="btn-outline py-3 text-center block w-full">
+          Baixar grátis
+        </a>
+      </div>
+
+      <!-- PRO -->
+      <div class="p-8 flex flex-col relative" style="background:linear-gradient(135deg,rgba(91,141,239,.12),rgba(124,58,237,.12));border:1.5px solid rgba(124,58,237,.4);border-radius:16px">
+        <div class="absolute -top-3 right-6 px-3 py-1 text-xs font-bold rounded-full" style="background:linear-gradient(135deg,#5B8DEF,#7C3AED);color:#fff">MAIS POPULAR</div>
+        <h3 class="font-bold text-xl mb-1 text-purple-300">Pro</h3>
+        <p class="text-slate-400 text-sm mb-4">Para quem leva o segundo cérebro a sério</p>
+        <div class="flex items-baseline gap-1 mb-1">
+          <span class="text-4xl font-black text-white">R$19</span>
+          <span class="text-slate-400">/mês</span>
+        </div>
+        <div class="flex items-center gap-2 mb-6">
+          <span class="text-slate-500 text-sm line-through">R$228/ano</span>
+          <span class="badge-off">R$120/ano — 47% off</span>
+        </div>
+        <ul class="space-y-3 text-sm text-slate-300 flex-1 mb-6">
+          <li class="flex gap-2"><span class="text-green-400">✓</span> Tudo do plano Gratuito</li>
+          <li class="flex gap-2"><span class="text-purple-400">✓</span> <strong>Logseq</strong></li>
+          <li class="flex gap-2"><span class="text-purple-400">✓</span> <strong>Notion</strong></li>
+          <li class="flex gap-2"><span class="text-purple-400">✓</span> <strong>Roam Research</strong></li>
+          <li class="flex gap-2"><span class="text-purple-400">✓</span> <strong>Revisão semanal com IA</strong></li>
+          <li class="flex gap-2"><span class="text-purple-400">✓</span> Suporte prioritário</li>
+        </ul>
+        <div class="flex flex-col gap-3">
+          <button onclick="checkout('monthly')" class="btn-primary py-3 text-white text-center w-full text-base">
+            R$19/mês
+          </button>
+          <button onclick="checkout('annual')" class="py-3 text-center w-full rounded-xl font-bold text-sm transition-all hover:opacity-90" style="background:rgba(255,213,79,.12);border:1.5px solid rgba(255,213,79,.3);color:#FFD54F">
+            R$120/ano <span class="text-xs opacity-70">(47% off)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-slate-500 text-sm mt-6">
+      🔒 Pagamento seguro via Stripe · Cancele quando quiser
+    </p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-20 px-6">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-12">Dúvidas frequentes</h2>
+    <div class="space-y-4">
+      <details class="card-glass p-6 cursor-pointer group">
+        <summary class="font-semibold list-none flex items-center justify-between">
+          Funciona sem internet?
+          <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">A transcrição com Whisper é 100% local — funciona offline. A formatação com IA usa a API Groq e precisa de internet só nesse passo.</p>
+      </details>
+      <details class="card-glass p-6 cursor-pointer group">
+        <summary class="font-semibold list-none flex items-center justify-between">
+          Meus áudios ficam armazenados na nuvem?
+          <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">Não. O modelo Whisper roda no seu PC. Nenhum áudio é enviado a servidores externos. Só o texto transcrito é enviado à API Groq para formatação.</p>
+      </details>
+      <details class="card-glass p-6 cursor-pointer group">
+        <summary class="font-semibold list-none flex items-center justify-between">
+          Posso cancelar o plano Pro?
+          <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">Sim, a qualquer momento. Após o cancelamento você continua com acesso Pro até o fim do período pago. Sem multas.</p>
+      </details>
+      <details class="card-glass p-6 cursor-pointer group">
+        <summary class="font-semibold list-none flex items-center justify-between">
+          Como recebo minha licença Pro?
+          <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">Automaticamente por email logo após o pagamento. Uma chave no formato <code class="text-blue-400">SINAPSE-XXXX-XXXX-XXXX</code> é gerada e enviada. Basta colar no app.</p>
+      </details>
+      <details class="card-glass p-6 cursor-pointer group">
+        <summary class="font-semibold list-none flex items-center justify-between">
+          Precisa de configuração técnica?
+          <span class="text-slate-500 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="mt-4 text-slate-400 text-sm leading-relaxed">Precisa de Python 3.10+ e Chrome instalados. Na primeira execução o modelo Whisper é baixado automaticamente (~800MB). Depois é só usar.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- GARANTIA -->
+<section class="py-16 px-6" style="background:rgba(15,32,64,.4)">
+  <div class="max-w-xl mx-auto text-center card-glass p-10">
+    <div class="text-5xl mb-4">🛡️</div>
+    <h3 class="text-2xl font-bold mb-3">Garantia de 7 dias</h3>
+    <p class="text-slate-400 leading-relaxed">Se o Sinapse&IA não transformar a forma como você organiza conhecimento nos primeiros 7 dias, devolvemos 100% do valor. Sem perguntas.</p>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="py-24 px-6 text-center relative overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(124,58,237,.1),transparent)"></div>
+  <div class="max-w-2xl mx-auto relative">
+    <h2 class="text-4xl font-black mb-4">Pronto para fortalecer<br/>seu segundo cérebro?</h2>
+    <p class="text-slate-400 mb-8">Comece agora com o plano gratuito. Evolua para o Pro quando quiser.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://github.com/clinicarenasce/sinapseia/releases/latest"
+         class="btn-primary px-10 py-4 text-lg text-white inline-block">
+        Começar grátis →
+      </a>
+      <a href="#pricing" class="btn-outline px-10 py-4 text-lg inline-block">
+        Ver Pro
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10 px-6 text-center text-slate-500 text-sm">
+  <div class="flex items-center justify-center gap-2 font-bold text-base text-slate-400 mb-3">
+    <span>🧠</span> Sinapse&IA
+  </div>
+  <p>© 2026 Clínica Renasce · <a href="mailto:contato@clinicarenasce.com.br" class="text-blue-400 hover:underline">contato@clinicarenasce.com.br</a></p>
+</footer>
+
+<script>
+async function checkout(plan) {
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Redirecionando...';
+  try {
+    const res = await fetch('https://sinapseia-checkout.clinicarenasce.workers.dev/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Erro ao iniciar checkout. Tente novamente.');
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  } catch (e) {
+    alert('Erro de conexão. Tente novamente.');
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
+}
+</script>
+</body>
+</html>
