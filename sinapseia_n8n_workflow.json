@@ -1,0 +1,92 @@
+{
+  "name": "SinapseIA Onboarding Email",
+  "nodes": [
+    {
+      "id": "node-webhook",
+      "name": "Stripe Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "stripe-sinapseia",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-sinapseia",
+        "responseMode": "onReceived",
+        "responseData": ""
+      }
+    },
+    {
+      "id": "node-code",
+      "name": "Gerar Chave",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const obj = $input.first().json.data.object;\nconst subId = obj.subscription || '';\nconst email = obj.customer_email || (obj.customer_details && obj.customer_details.email) || '';\n\nconst salt = 'sinapseia2024';\nlet h1 = 5381, h2 = 2166136261;\nconst str = subId + salt;\nfor (let i = 0; i < str.length; i++) {\n  const c = str.charCodeAt(i);\n  h1 = ((h1 * 33) ^ c) >>> 0;\n  h2 = (Math.imul(h2 ^ c, 16777619)) >>> 0;\n}\nconst toHex = n => {\n  const s = (n & 0xFFFF).toString(16).toUpperCase();\n  return '0000'.slice(s.length) + s;\n};\nconst chave = 'SINAPSE-' + toHex(h1) + '-' + toHex(h2) + '-' + toHex(h1 ^ h2);\n\nreturn [{ json: { chave, email, subscription_id: subId } }];"
+      }
+    },
+    {
+      "id": "node-kv",
+      "name": "Registrar no Cloudflare KV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [750, 300],
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.cloudflare.com/client/v4/accounts/8cefb5bd07923f5d8d1b047ed070e42c/storage/kv/namespaces/644f640141d5487c86db306010700686/values/{{ $json.chave }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer COLE_SEU_CLOUDFLARE_API_TOKEN_AQUI"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/plain"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/plain",
+        "body": "active"
+      }
+    },
+    {
+      "id": "node-email",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1000, 300],
+      "parameters": {
+        "fromEmail": "noreply@sinapseia.com",
+        "toEmail": "={{ $('Gerar Chave').item.json.email }}",
+        "subject": "Sua chave Pro do Sinapse&IA chegou!",
+        "emailType": "text",
+        "message": "=Ola! Bem-vindo ao Sinapse&IA Pro.\n\nSua chave de licenca:\n{{ $('Gerar Chave').item.json.chave }}\n\nComo ativar:\n1. Baixe o app: https://github.com/clinicarenasce/sinapseia/releases/download/v1.0/SinapseIA_v1.0_Windows.zip\n2. Instale e abra o Sinapse&IA\n3. Cole sua chave Pro quando solicitado\n\nSeu trial de 30 dias comeca agora!\n\nEquipe Sinapse&IA"
+      }
+    }
+  ],
+  "connections": {
+    "Stripe Webhook": {
+      "main": [
+        [{ "node": "Gerar Chave", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gerar Chave": {
+      "main": [
+        [{ "node": "Registrar no Cloudflare KV", "type": "main", "index": 0 }]
+      ]
+    },
+    "Registrar no Cloudflare KV": {
+      "main": [
+        [{ "node": "Enviar Email", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

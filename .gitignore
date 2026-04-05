@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
+.env/
+
+# Modelos Whisper (baixados em runtime, podem ser grandes)
+*.bin
+*.pt
+
+# Configs locais com chaves de API (fora do repo de propósito)
+.sinapseia_config.json
+.spongi_config.json
+
+# Histórico local
+.transcritor_historico.json
+
+# Gravações e arquivos de audio gerados
+*.wav
+*.mp3
+*.mp4
+*.m4a
+
+# Build/distribuição
+*.spec
+*.exe
+output/
+dist_build/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Temporários
+*.tmp
+*.bak
+Novo(a)*
+*_backup.py

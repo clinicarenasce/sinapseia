@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sinapse&IA</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="/logo.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="/eel.js"></script>
+<script>tailwind.config={theme:{extend:{colors:{sn:{50:'#F0F4FF',100:'#E0EAFF',200:'#C2D4FF',300:'#8FB2FF',400:'#5B8DEF',500:'#3A6FD8',600:'#1E4FAF',700:'#0D2B6B',800:'#091B45',900:'#060F2A'},au:{300:'#FFE08A',400:'#FFD54F',500:'#FFC107',600:'#E5A800',700:'#B8860B'}}}}}</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box}body{font-family:'Inter',sans-serif;margin:0;color:#E0EAFF}
+body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 600px 400px at 20% 30%,rgba(59,130,246,.08) 0%,transparent 70%),radial-gradient(ellipse 500px 350px at 80% 60%,rgba(255,193,7,.05) 0%,transparent 70%),linear-gradient(180deg,#060F2A 0%,#091B45 40%,#0D2B6B 100%)}
+.card{background:rgba(14,30,70,.45);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);border:1px solid rgba(91,141,239,.12);box-shadow:0 4px 40px rgba(6,15,42,.4);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 60%);pointer-events:none}
+.dz{border:2px dashed rgba(91,141,239,.4);background:rgba(14,30,70,.4);transition:all .3s;cursor:pointer}.dz:hover{border-color:#5B8DEF;background:rgba(91,141,239,.08)}.dz.drag-over{border-color:#FFC107!important;background:rgba(255,193,7,.08)!important}.dz.ok{border-style:solid;border-color:#22c55e;background:rgba(34,197,94,.06)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes neuronFloat{0%{opacity:0;transform:translateY(0)}50%{opacity:1}100%{opacity:0;transform:translateY(-30px)}}
+@keyframes synapsePulse{0%,100%{opacity:.3}50%{opacity:.8}}
+@keyframes brainWave{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}
+@keyframes sglow{0%,100%{opacity:.6}50%{opacity:1}}
+.fi{animation:fadeIn .3s ease-out}.pulse-anim{animation:pulse 2s ease-in-out infinite}
+.neuron-float{animation:neuronFloat 3s ease-out infinite}
+.synapse-pulse{animation:synapsePulse 1.5s ease-in-out infinite}
+/* --- Bubble Glass Base --- */
+.btn-glass{backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,.08);font-weight:600;transition:all .25s ease;border-radius:14px;position:relative;overflow:hidden}
+.btn-glass::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);pointer-events:none}
+.btn-glass:hover{transform:translateY(-2px)}.btn-glass:active{transform:translateY(0);transition:transform .1s}
+.btn-glass:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important;filter:grayscale(.3)}
+/* Outline (default) */
+.bo{background:rgba(91,141,239,.08);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(91,141,239,.18);color:#8FB2FF;font-weight:600;transition:all .25s ease;border-radius:14px;position:relative;overflow:hidden}
+.bo::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%);pointer-events:none}
+.bo:hover{background:rgba(91,141,239,.15);border-color:rgba(91,141,239,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(91,141,239,.12)}.bo:active{transform:translateY(0)}
+/* Primary (gold) */
+.bs{background:rgba(255,193,7,.15);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,193,7,.25);color:#FFD54F;font-weight:700;transition:all .25s ease;border-radius:14px;position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(255,193,7,.12)}
+.bs::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.1) 0%,transparent 50%);pointer-events:none}
+.bs:hover{background:rgba(255,193,7,.22);border-color:rgba(255,193,7,.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,193,7,.2)}.bs:active{transform:translateY(0)}
+.bs:disabled{opacity:.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+/* Danger (red) */
+.br{background:rgba(239,68,68,.12);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(239,68,68,.2);color:#fca5a5;font-weight:700;transition:all .25s ease;border-radius:14px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(239,68,68,.1)}
+.br::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);pointer-events:none}
+.br:hover{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.15)}.br:active{transform:translateY(0)}
+textarea{background:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:12px;resize:none}textarea:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}textarea::placeholder{color:#5B8DEF;opacity:.4}
+input[type="text"],input[type="password"]{background:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:8px}input:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}
+select{background-color:rgba(9,27,69,.6);border:1.5px solid rgba(91,141,239,.2);color:#E0EAFF;border-radius:8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235B8DEF' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}select:focus{outline:none;box-shadow:0 0 0 3px rgba(91,141,239,.2);border-color:#5B8DEF}
+.toast{animation:slideIn .3s ease-out,fadeOut .3s ease-in 2.7s}@keyframes slideIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:rgba(91,141,239,.3);border-radius:3px}
+.hi{transition:all .15s;border-radius:8px}.hi:hover{background:rgba(91,141,239,.1);padding-left:20px}
+@keyframes checkCircle{to{stroke-dashoffset:0}}
+@keyframes checkMark{to{stroke-dashoffset:0}}
+.sk-line{border-radius:4px;background:linear-gradient(90deg,rgba(91,141,239,.10) 25%,rgba(91,141,239,.22) 50%,rgba(91,141,239,.10) 75%);background-size:200% 100%;animation:shimmer 1.8s ease-in-out infinite;display:block}
+/* Back pill */
+.btn-back{
+    background:rgba(91,141,239,.08);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+    border:1px solid rgba(91,141,239,.15);
+    color:#8FB2FF;font-weight:700;border-radius:50px;
+    padding:10px 28px;font-size:13px;
+    box-shadow:0 2px 16px rgba(91,141,239,.08);
+    transition:all .25s ease;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+    position:relative;overflow:hidden;
+}
+.btn-back::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%);pointer-events:none}
+.btn-back:hover{background:rgba(91,141,239,.15);border-color:rgba(91,141,239,.25);box-shadow:0 8px 24px rgba(91,141,239,.12);transform:translateY(-2px)}
+.btn-back:active{transform:translateY(0)}
+.btn-back .back-dot{width:6px;height:6px;border-radius:50%;background:#FFC107;display:inline-block;animation:pulse 2s ease-in-out infinite}
+/* Option cards */
+.opt-card{
+    border:1px solid rgba(91,141,239,.1);
+    background:rgba(91,141,239,.06);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+    border-radius:16px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .3s ease;
+    position:relative;overflow:hidden;
+}
+.opt-card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 50%);pointer-events:none}
+.opt-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(91,141,239,.15);background:rgba(91,141,239,.12);border-color:rgba(255,193,7,.3)}
+.opt-card:hover .opt-label{color:#FFC107!important}
+.opt-card:hover .opt-sub{color:#FFE08A!important}
+/* Obsidian purple variant */
+.obsidian-btn{border-color:rgba(124,58,237,.2)!important;color:#c4b5fd!important;background:rgba(124,58,237,.08)!important}
+.obsidian-btn:hover{background:rgba(124,58,237,.15)!important;border-color:rgba(124,58,237,.3)!important;box-shadow:0 8px 24px rgba(124,58,237,.12)!important}
+/* Obsidian primary (save/format) */
+.btn-obsidian-primary{background:rgba(124,58,237,.15);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(124,58,237,.25);color:#c4b5fd;font-weight:700;border-radius:14px;transition:all .25s ease;box-shadow:0 2px 16px rgba(124,58,237,.1);position:relative;overflow:hidden}
+.btn-obsidian-primary::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);pointer-events:none}
+.btn-obsidian-primary:hover{background:rgba(124,58,237,.22);border-color:rgba(124,58,237,.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,.18)}
+/* Green primary (save changes) */
+.btn-green-primary{background:rgba(34,197,94,.12);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(34,197,94,.2);color:#86efac;font-weight:700;border-radius:14px;transition:all .25s ease;box-shadow:0 2px 16px rgba(34,197,94,.1);position:relative;overflow:hidden}
+.btn-green-primary::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);pointer-events:none}
+.btn-green-primary:hover{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.35);transform:translateY(-2px);box-shadow:0 8px 32px rgba(34,197,94,.15)}
+/* Danger outline variant */
+.bo-danger{border-color:rgba(239,68,68,.2)!important;color:#fca5a5!important;background:rgba(239,68,68,.06)!important}
+.bo-danger:hover{background:rgba(239,68,68,.12)!important;border-color:rgba(239,68,68,.3)!important;box-shadow:0 8px 24px rgba(239,68,68,.1)!important}
+/* Warn outline variant */
+.bo-warn{border-color:rgba(245,158,11,.2)!important;color:#fbbf24!important;background:rgba(245,158,11,.06)!important}
+.bo-warn:hover{background:rgba(245,158,11,.12)!important;border-color:rgba(245,158,11,.3)!important;box-shadow:0 8px 24px rgba(245,158,11,.1)!important}
+/* Success outline variant */
+.bo-success{border-color:rgba(34,197,94,.2)!important;color:#4ade80!important;background:rgba(34,197,94,.06)!important}
+.bo-success:hover{background:rgba(34,197,94,.12)!important;border-color:rgba(34,197,94,.3)!important;box-shadow:0 8px 24px rgba(34,197,94,.1)!important}
+/* Platform cards */
+.plt-card{border:1px solid rgba(91,141,239,.12);background:rgba(91,141,239,.05);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s ease;position:relative;overflow:hidden}
+.plt-card::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 50%);pointer-events:none}
+.plt-card:hover{transform:translateY(-2px);border-color:rgba(255,193,7,.25)}
+.plt-card.active{border-color:rgba(255,193,7,.4)!important;background:rgba(255,193,7,.07)!important;box-shadow:0 4px 16px rgba(255,193,7,.1)}
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+<div class="w-full max-w-2xl">
+
+<!-- Header -->
+<div class="text-center mb-6">
+    <div class="w-20 h-20 mx-auto mb-3 relative">
+        <svg viewBox="0 0 80 80" class="w-full h-full pulse-anim">
+            <!-- Neuron body -->
+            <circle cx="40" cy="40" r="16" fill="url(#neuronGrad)" stroke="#FFC107" stroke-width="1.5"/>
+            <!-- Dendrites -->
+            <line x1="40" y1="24" x2="40" y2="8" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+            <line x1="26" y1="30" x2="14" y2="18" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+            <line x1="54" y1="30" x2="66" y2="18" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+            <line x1="26" y1="50" x2="12" y2="60" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+            <line x1="54" y1="50" x2="68" y2="60" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+            <line x1="40" y1="56" x2="40" y2="72" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+            <!-- Synapse dots -->
+            <circle cx="40" cy="8" r="3" fill="#FFC107" opacity=".8"/>
+            <circle cx="14" cy="18" r="2.5" fill="#FFC107" opacity=".6"/>
+            <circle cx="66" cy="18" r="2.5" fill="#FFC107" opacity=".6"/>
+            <circle cx="12" cy="60" r="2.5" fill="#FFC107" opacity=".5"/>
+            <circle cx="68" cy="60" r="2.5" fill="#FFC107" opacity=".5"/>
+            <circle cx="40" cy="72" r="3" fill="#FFC107" opacity=".8"/>
+            <!-- Nucleus -->
+            <circle cx="40" cy="40" r="6" fill="#FFC107" opacity=".9"/>
+            <defs>
+                <radialGradient id="neuronGrad" cx="40%" cy="40%"><stop offset="0%" stop-color="#1E4FAF"/><stop offset="100%" stop-color="#0D2B6B"/></radialGradient>
+            </defs>
+        </svg>
+    </div>
+    <h1 class="text-3xl font-extrabold tracking-tight"><span class="text-sn-300">Sinapse</span><span class="text-au-500">&</span><span class="text-sn-300">IA</span></h1>
+    <p class="text-sm text-sn-400 mt-1 font-medium">Fortaleca as conexoes do seu segundo cerebro</p>
+</div>
+
+<div class="card rounded-2xl p-6">
+
+<!-- ===== INICIO: 3 opcoes ===== -->
+<div id="S0" class="space-y-4">
+    <div class="grid grid-cols-3 gap-3">
+        <!-- Opcao 1: Arquivo -->
+        <div class="opt-card" onclick="selecionarArquivo()" id="optArquivo">
+            <svg width="40" height="40" viewBox="0 0 40 40" class="mx-auto mb-2">
+                <rect x="8" y="6" width="24" height="28" rx="4" fill="none" stroke="#5B8DEF" stroke-width="1.5"/>
+                <path d="M14 14h12M14 19h8M14 24h10" stroke="#FFC107" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <p class="text-sm font-bold text-sn-200 opt-label">Arquivo</p>
+            <p class="text-xs text-sn-400 mt-1 opt-sub">Selecionar audio</p>
+        </div>
+        <!-- Opcao 2: Gravar -->
+        <div class="opt-card" onclick="mostrarGravar()" id="optGravar">
+            <svg width="40" height="40" viewBox="0 0 40 40" class="mx-auto mb-2">
+                <rect x="14" y="6" width="12" height="20" rx="6" fill="none" stroke="#5B8DEF" stroke-width="1.5"/>
+                <path d="M10 20a10 10 0 0020 0" fill="none" stroke="#FFC107" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="20" y1="30" x2="20" y2="35" stroke="#FFC107" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <p class="text-sm font-bold text-sn-200 opt-label">Gravar</p>
+            <p class="text-xs text-sn-400 mt-1 opt-sub">Audio do PC</p>
+        </div>
+        <!-- Opcao 3: Texto -->
+        <div class="opt-card" onclick="mostrarTexto()" id="optTexto">
+            <svg width="40" height="40" viewBox="0 0 40 40" class="mx-auto mb-2">
+                <rect x="8" y="8" width="24" height="24" rx="4" fill="none" stroke="#5B8DEF" stroke-width="1.5"/>
+                <path d="M14 15h12M14 20h8M14 25h10" stroke="#FFC107" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="32" cy="32" r="6" fill="#0D2B6B" stroke="#FFC107" stroke-width="1.5"/>
+                <path d="M30 32h4M32 30v4" stroke="#FFC107" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+            <p class="text-sm font-bold text-sn-200 opt-label">Texto</p>
+            <p class="text-xs text-sn-400 mt-1 opt-sub">Colar e formatar</p>
+        </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div id="dropZone" class="dz rounded-xl p-6 text-center hidden" onclick="selecionarArquivo()">
+        <p id="dropText" class="text-sn-300 text-sm"><span class="text-au-500 font-bold">Solte o arquivo aqui</span></p>
+    </div>
+
+    <!-- Arquivo selecionado -->
+    <div id="arquivoInfo" class="hidden text-center py-3">
+        <p id="arquivoNome" class="text-sm text-sn-200 font-bold"></p>
+        <button onclick="transcrever()" class="bs py-3 px-8 text-sm mt-3">&#9654; Transcrever</button>
+    </div>
+
+    <!-- Painel gravar -->
+    <div id="painelGravar" class="hidden space-y-3 fi">
+        <div class="flex items-center gap-3">
+            <label class="text-sm font-bold text-sn-300 whitespace-nowrap">Fonte</label>
+            <select id="deviceSelect" class="w-full px-4 py-2.5 text-sm appearance-none cursor-pointer"><option>Carregando...</option></select>
+        </div>
+        <button onclick="iniciarGravacao()" class="br py-3 w-full text-sm">&#9679; Iniciar gravacao</button>
+    </div>
+
+    <!-- Painel texto -->
+    <div id="painelTexto" class="hidden space-y-3 fi">
+        <textarea id="textoLivre" rows="6" class="w-full p-4 text-sm leading-relaxed" placeholder="Cole ou digite o texto que deseja transformar em nota do Obsidian..." oninput="checarTextoLivre()"></textarea>
+        <button id="btnFormatarTexto" onclick="formatarTextoDireto()" class="hidden w-full py-3 text-sm btn-obsidian-primary fi">&#129504; Formatar para Obsidian</button>
+    </div>
+</div>
+
+<!-- ===== GRAVANDO ===== -->
+<div id="S1" class="hidden">
+    <div id="audioViz" class="flex items-end justify-center gap-1 h-20 px-4 py-3 rounded-xl mb-4" style="background:rgba(9,27,69,.5);border:1px solid rgba(91,141,239,.15)"></div>
+    <p id="recTimer" class="text-center text-2xl font-mono text-au-400 font-bold mb-4">00:00</p>
+    <div class="grid grid-cols-3 gap-3">
+        <button onclick="cancelarGravacao()" class="bo bo-danger py-3 text-xs flex flex-col items-center gap-1"><span class="text-lg">&#10006;</span>Cancelar</button>
+        <button onclick="pausarGravacao()" class="bo bo-warn py-3 text-xs flex flex-col items-center gap-1"><span id="piIco" class="text-lg">&#9208;</span><span id="piTxt">Pausar</span></button>
+        <button onclick="pararGravacao()" class="bo bo-success py-3 text-xs flex flex-col items-center gap-1"><span class="text-lg">&#9632;</span>Parar</button>
+    </div>
+</div>
+
+<!-- ===== TRANSCREVENDO (neuronio processando) ===== -->
+<div id="S2" class="hidden">
+    <div class="flex flex-col items-center py-5">
+        <svg class="pulse-anim" width="120" height="120" viewBox="0 0 120 120">
+            <!-- Central neuron -->
+            <circle cx="60" cy="60" r="20" fill="url(#ng2)" stroke="#FFC107" stroke-width="2"/>
+            <circle cx="60" cy="60" r="8" fill="#FFC107" opacity=".8"/>
+            <!-- Dendrites with signals -->
+            <line x1="60" y1="40" x2="60" y2="15" stroke="#5B8DEF" stroke-width="2" opacity=".7"/>
+            <line x1="43" y1="47" x2="22" y2="28" stroke="#5B8DEF" stroke-width="2" opacity=".6"/>
+            <line x1="77" y1="47" x2="98" y2="28" stroke="#5B8DEF" stroke-width="2" opacity=".6"/>
+            <line x1="43" y1="73" x2="22" y2="92" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+            <line x1="77" y1="73" x2="98" y2="92" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+            <line x1="60" y1="80" x2="60" y2="105" stroke="#5B8DEF" stroke-width="2" opacity=".7"/>
+            <!-- Signal pulses -->
+            <circle cx="60" cy="15" r="4" fill="#FFC107" class="synapse-pulse"/>
+            <circle cx="22" cy="28" r="3" fill="#FFC107" class="synapse-pulse" style="animation-delay:.3s"/>
+            <circle cx="98" cy="28" r="3" fill="#FFC107" class="synapse-pulse" style="animation-delay:.6s"/>
+            <circle cx="22" cy="92" r="3" fill="#FFC107" class="synapse-pulse" style="animation-delay:.9s"/>
+            <circle cx="98" cy="92" r="3" fill="#FFC107" class="synapse-pulse" style="animation-delay:1.2s"/>
+            <circle cx="60" cy="105" r="4" fill="#FFC107" class="synapse-pulse" style="animation-delay:.5s"/>
+            <!-- Floating signals -->
+            <circle cx="35" cy="20" r="2" fill="#5B8DEF" class="neuron-float" opacity=".6"/>
+            <circle cx="90" cy="18" r="1.5" fill="#FFC107" class="neuron-float" style="animation-delay:.8s" opacity=".5"/>
+            <defs><radialGradient id="ng2" cx="40%" cy="40%"><stop offset="0%" stop-color="#1E4FAF"/><stop offset="100%" stop-color="#0D2B6B"/></radialGradient></defs>
+        </svg>
+        <p id="s2txt" class="text-sn-300 text-sm font-semibold mt-2">Processando conexoes neurais...</p>
+    </div>
+    <div class="rounded-xl p-4" style="background:rgba(9,27,69,.5);border:1px solid rgba(91,141,239,.15)">
+        <div class="flex items-center justify-between mb-2">
+            <p id="s2lt" class="text-xs text-sn-400 font-medium">Carregando modelo...</p>
+            <span id="s2p" class="text-xs text-au-500 font-mono font-bold">0%</span>
+        </div>
+        <div class="w-full h-2 rounded-full overflow-hidden" style="background:rgba(91,141,239,.15)"><div id="s2b" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#FFC107,#E5A800,#FFC107);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;transition:width .3s"></div></div>
+    </div>
+    <button onclick="cancelarTranscricao()" class="w-full mt-3 py-2.5 text-sm bo bo-danger">&#10006; Cancelar</button>
+</div>
+
+<!-- ===== FORMATANDO (IA processando) ===== -->
+<div id="S3" class="hidden">
+    <!-- Skeleton: prévia da nota sendo gerada -->
+    <div class="rounded-xl p-4 mb-3" style="background:rgba(9,27,69,.5);border:1px solid rgba(91,141,239,.15)">
+        <p id="s3txt" class="text-xs text-sn-400 font-semibold mb-3 text-center tracking-wider uppercase">Formatando com IA...</p>
+        <!-- Frontmatter -->
+        <div style="border-left:2px solid rgba(124,58,237,.3);padding-left:10px;margin-bottom:14px">
+            <span class="sk-line mb-1.5" style="width:18%;height:7px"></span>
+            <span class="sk-line mb-1.5" style="width:30%;height:7px"></span>
+            <span class="sk-line" style="width:22%;height:7px"></span>
+        </div>
+        <!-- Título H1 -->
+        <span class="sk-line mb-4" style="width:68%;height:13px"></span>
+        <!-- ## Resumo -->
+        <span class="sk-line mb-2" style="width:22%;height:10px;opacity:.6"></span>
+        <span class="sk-line mb-1.5" style="width:100%;height:7px"></span>
+        <span class="sk-line mb-4" style="width:80%;height:7px"></span>
+        <!-- ## Conteúdo -->
+        <span class="sk-line mb-2" style="width:32%;height:10px;opacity:.6"></span>
+        <span class="sk-line mb-1.5" style="width:100%;height:7px"></span>
+        <span class="sk-line mb-1.5" style="width:92%;height:7px"></span>
+        <span class="sk-line mb-1.5" style="width:97%;height:7px"></span>
+        <span class="sk-line mb-4" style="width:74%;height:7px"></span>
+        <!-- ## Conceitos-chave -->
+        <span class="sk-line mb-2" style="width:38%;height:10px;opacity:.6"></span>
+        <span class="sk-line mb-1.5" style="width:55%;height:7px"></span>
+        <span class="sk-line" style="width:45%;height:7px"></span>
+    </div>
+    <!-- Barra de progresso -->
+    <div class="rounded-xl p-4" style="background:rgba(9,27,69,.5);border:1px solid rgba(91,141,239,.15)">
+        <div class="flex items-center justify-between mb-2">
+            <p id="s3lt" class="text-xs text-sn-400 font-medium">Processando com IA...</p>
+            <span id="s3p" class="text-xs font-mono font-bold" style="color:#a78bfa">0%</span>
+        </div>
+        <div class="w-full h-2 rounded-full overflow-hidden" style="background:rgba(91,141,239,.15)"><div id="s3b" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;transition:width .3s"></div></div>
+    </div>
+</div>
+
+<!-- ===== EDITOR ===== -->
+<div id="S4" class="hidden">
+    <!-- Banner seletor de idioma (aparece quando detectado != pt) -->
+    <div id="idiomaBanner" class="hidden rounded-xl p-3 mb-3 fi" style="background:rgba(255,193,7,.07);border:1px solid rgba(255,193,7,.18)">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-bold text-au-400">&#127760; Idioma detectado: <span id="idiomaDetNome" class="text-sn-200"></span></p>
+            <button onclick="dispensarIdiomaBanner()" class="text-xs text-sn-500 opacity-50 hover:opacity-100 transition-opacity">&#10005; manter</button>
+        </div>
+        <p class="text-xs text-sn-400 mb-2">Traduzir transcricao para:</p>
+        <div class="grid grid-cols-5 gap-1.5" id="idiomaGrid">
+            <button onclick="traduzirTranscricao('pt')" class="plt-card py-2 px-1"><p class="text-xs font-bold" style="color:#c4b5fd">Portugues</p></button>
+            <button onclick="traduzirTranscricao('en')" class="plt-card py-2 px-1"><p class="text-xs font-bold" style="color:#93c5fd">English</p></button>
+            <button onclick="traduzirTranscricao('es')" class="plt-card py-2 px-1"><p class="text-xs font-bold" style="color:#86efac">Espanol</p></button>
+            <button onclick="traduzirTranscricao('fr')" class="plt-card py-2 px-1"><p class="text-xs font-bold" style="color:#67e8f9">Francais</p></button>
+            <button onclick="traduzirTranscricao('zh')" class="plt-card py-2 px-1"><p class="text-xs font-bold" style="color:#fca5a5">Mandarin</p></button>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="text-xs text-sn-400 uppercase tracking-wider block mb-1 text-center">Nome do arquivo</label>
+        <input id="nomeEdit" type="text" class="w-full rounded-lg px-4 py-2.5 text-sm text-center font-bold" placeholder="Nome do arquivo...">
+    </div>
+    <div class="mb-4">
+        <div class="flex items-center justify-between mb-2"><span class="text-xs text-sn-400 font-bold uppercase tracking-wider">Resultado</span><span id="cc" class="text-xs text-sn-500 opacity-60"></span></div>
+        <textarea id="txRes" rows="8" class="w-full p-4 text-sm font-mono leading-relaxed"></textarea>
+    </div>
+    <div id="actBtns" class="grid grid-cols-5 gap-2 mb-3">
+        <button onclick="copiarTexto()" class="bo py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#128203;</span>Copiar</button>
+        <button onclick="salvarTexto()" class="bo py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#128190;</span>Salvar</button>
+        <button onclick="abrirTxt()" class="bo py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#128194;</span>Abrir</button>
+        <button id="bObs" onclick="formatarObsidian()" class="bo obsidian-btn py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#129504;</span><span id="bObsT">Obsidian</span></button>
+        <button onclick="excluirNota()" class="bo bo-danger py-2 text-xs flex flex-col items-center gap-1"><span class="text-base">&#128465;</span>Excluir</button>
+    </div>
+    <div id="delBox" class="hidden grid grid-cols-4 gap-2 mb-3">
+        <button onclick="confirmarExcluir('obsidian')" class="bo obsidian-btn py-3 text-xs flex flex-col items-center gap-1"><span>&#128465;</span>Do Obsidian</button>
+        <button onclick="confirmarExcluir('transcricao')" class="bo py-3 text-xs flex flex-col items-center gap-1"><span>&#128221;</span>Transcricao</button>
+        <button onclick="confirmarExcluir('ambos')" class="bo bo-danger py-3 text-xs flex flex-col items-center gap-1"><span>&#128165;</span>Ambos</button>
+        <button onclick="cancelarExcluir()" class="bo py-3 text-xs flex flex-col items-center gap-1"><span>&#8592;</span>Voltar</button>
+    </div>
+    <div id="actLoad" class="hidden rounded-xl p-4 mb-3" style="background:rgba(9,27,69,.5);border:1px solid rgba(91,141,239,.15)">
+        <div class="flex items-center justify-between mb-2"><p id="alTxt" class="text-xs text-sn-400 font-medium">Salvando...</p><span id="alP" class="text-xs text-au-500 font-mono font-bold">0%</span></div>
+        <div class="w-full h-2 rounded-full overflow-hidden" style="background:rgba(91,141,239,.15)"><div id="alB" class="h-full rounded-full" style="width:0%;background:linear-gradient(90deg,#FFC107,#E5A800,#FFC107);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite;transition:width .3s"></div></div>
+    </div>
+    <!-- ===== PARA ONDE ENVIAR? ===== -->
+    <div id="platformSave" class="hidden space-y-3 mb-3">
+        <p class="text-xs text-sn-400 font-bold uppercase tracking-wider text-center">Para onde enviar?</p>
+        <div class="grid grid-cols-4 gap-2">
+            <button onclick="selecionarPlataforma('obsidian')" id="plt-obsidian" class="plt-card active">
+                <img src="/assets/brands/obsidian.svg" class="w-7 h-7 mx-auto mb-1.5">
+                <p class="text-xs font-bold" style="color:#c4b5fd">Obsidian</p>
+            </button>
+            <button onclick="selecionarPlataforma('logseq')" id="plt-logseq" class="plt-card">
+                <img src="/assets/brands/logseq.svg" class="w-7 h-7 mx-auto mb-1.5">
+                <p class="text-xs font-bold" style="color:#86efac">Logseq</p>
+            </button>
+            <button onclick="selecionarPlataforma('notion')" id="plt-notion" class="plt-card">
+                <img src="/assets/brands/notion.svg" class="w-7 h-7 mx-auto mb-1.5">
+                <p class="text-xs font-bold text-sn-300">Notion</p>
+            </button>
+            <button onclick="selecionarPlataforma('roam')" id="plt-roam" class="plt-card">
+                <img src="/assets/brands/roam.svg" class="w-7 h-7 mx-auto mb-1.5">
+                <p class="text-xs font-bold" style="color:#93c5fd">Roam</p>
+            </button>
+        </div>
+        <!-- Obsidian options -->
+        <div id="obsSave" class="space-y-3">
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-sn-400 font-bold uppercase tracking-wider whitespace-nowrap">Vault</label>
+                <select id="vaultSelect" class="flex-1 px-3 py-2 text-sm appearance-none cursor-pointer" style="background-color:rgba(9,27,69,.6);border:1.5px solid rgba(124,58,237,.3);color:#a78bfa"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="salvarObsidianComNome()" class="py-3 text-sm btn-obsidian-primary flex items-center justify-center gap-2">&#128640; Salvar no Obsidian</button>
+                <button onclick="escolherPastaObsidian()" class="bo obsidian-btn py-3 text-sm flex items-center justify-center gap-2">&#128194; Escolher pasta</button>
+            </div>
+        </div>
+        <!-- Logseq options -->
+        <div id="logseqSave" class="hidden space-y-3">
+            <div class="flex items-center gap-2">
+                <label class="text-xs text-sn-400 font-bold uppercase tracking-wider whitespace-nowrap">Graph</label>
+                <select id="logseqSelect" class="flex-1 px-3 py-2 text-sm appearance-none cursor-pointer" style="background-color:rgba(9,27,69,.6);border:1.5px solid rgba(34,197,94,.3);color:#86efac"></select>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="salvarLogseqComNome()" class="py-3 text-sm btn-green-primary flex items-center justify-center gap-2">&#128640; Salvar no Logseq</button>
+                <button onclick="escolherPastaLogseq()" class="bo bo-success py-3 text-sm flex items-center justify-center gap-2">&#128194; Escolher pasta</button>
+            </div>
+        </div>
+        <!-- Notion options -->
+        <div id="notionSave" class="hidden space-y-3">
+            <div id="notionConfigForm" class="space-y-3">
+                <div class="rounded-xl p-3 space-y-1 text-xs" style="background:rgba(91,141,239,.06);border:1px solid rgba(91,141,239,.12)">
+                    <p class="font-bold text-sn-300">Como configurar:</p>
+                    <p class="text-sn-400 leading-relaxed">1. Acesse <span class="text-au-500 font-semibold">notion.so/my-integrations</span> e crie uma integracao</p>
+                    <p class="text-sn-400 leading-relaxed">2. Copie o <span class="text-sn-200 font-semibold">Token</span> que começa com <code class="text-au-400">secret_</code></p>
+                    <p class="text-sn-400 leading-relaxed">3. Abra a <span class="text-sn-200 font-semibold">pagina pai</span> onde as notas serao salvas</p>
+                    <p class="text-sn-400 leading-relaxed">4. Na pagina: clique <span class="text-sn-200 font-semibold">... → Conectar a →</span> selecione sua integracao</p>
+                    <p class="text-sn-400 leading-relaxed">5. Copie o <span class="text-sn-200 font-semibold">ID da pagina</span> da URL (32 chars no final)</p>
+                </div>
+                <input id="notionToken" type="password" class="w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Token (secret_xxxxxxxxxxxxxxxxxxxxxxxx...)">
+                <input id="notionParentId" type="text" class="w-full rounded-lg px-3 py-2.5 text-sm" placeholder="ID da pagina pai (abc123def456789012345678901234ab)">
+                <button onclick="salvarConfigNotion()" class="bo py-2.5 text-sm w-full">&#128274; Salvar configuracao Notion</button>
+            </div>
+            <div id="notionSaveBtn" class="hidden">
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="salvarNotionComNome()" class="py-3 text-sm bo flex items-center justify-center gap-2" style="border-color:rgba(100,100,100,.25);background:rgba(30,30,30,.3);color:#e5e7eb">&#128640; Salvar no Notion</button>
+                    <button onclick="reconfigurarNotion()" class="bo py-3 text-sm flex items-center justify-center gap-2">&#9881; Reconfigurar</button>
+                </div>
+            </div>
+        </div>
+        <!-- Roam placeholder -->
+        <div id="roamSave" class="hidden text-center py-4 space-y-1">
+            <p class="text-sm font-bold" style="color:#93c5fd">&#128680; Roam Research</p>
+            <p class="text-xs text-sn-500 opacity-50">Integracao em desenvolvimento &mdash; em breve!</p>
+        </div>
+    </div>
+    <!-- Salvar alteracoes (modo edicao) -->
+    <div id="editBtns" class="hidden grid grid-cols-2 gap-3 mb-3">
+        <button onclick="salvarAlteracoes()" class="py-3 text-sm btn-green-primary flex items-center justify-center gap-2">&#128190; Salvar alteracoes</button>
+        <button onclick="cancelarEdicao()" class="bo bo-danger py-3 text-sm flex items-center justify-center gap-2">&#10006; Cancelar</button>
+    </div>
+    <div class="text-center mt-3"><button onclick="voltarInicio()" class="btn-back"><span class="back-dot"></span>Voltar ao inicio</button></div>
+</div>
+
+<!-- ===== CONFIRMACAO ===== -->
+<div id="S6" class="hidden">
+    <div class="flex flex-col items-center py-6">
+        <!-- Neuron + check verde (salvar) -->
+        <div id="s6Salvar" class="hidden flex items-center justify-center gap-4">
+            <svg width="80" height="80" viewBox="0 0 80 80" class="pulse-anim">
+                <circle cx="40" cy="40" r="18" fill="url(#ng6)" stroke="#FFC107" stroke-width="2"/>
+                <circle cx="40" cy="40" r="7" fill="#FFC107" opacity=".8"/>
+                <line x1="40" y1="22" x2="40" y2="10" stroke="#5B8DEF" stroke-width="2" opacity=".6"/>
+                <line x1="25" y1="30" x2="15" y2="20" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+                <line x1="55" y1="30" x2="65" y2="20" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+                <line x1="25" y1="50" x2="15" y2="60" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+                <line x1="55" y1="50" x2="65" y2="60" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+                <line x1="40" y1="58" x2="40" y2="70" stroke="#5B8DEF" stroke-width="2" opacity=".6"/>
+                <circle cx="40" cy="10" r="3" fill="#FFC107" opacity=".7"/>
+                <circle cx="15" cy="20" r="2" fill="#FFC107" opacity=".5"/>
+                <circle cx="65" cy="20" r="2" fill="#FFC107" opacity=".5"/>
+                <defs><radialGradient id="ng6" cx="40%" cy="40%"><stop offset="0%" stop-color="#1E4FAF"/><stop offset="100%" stop-color="#0D2B6B"/></radialGradient></defs>
+            </svg>
+            <svg width="56" height="56" viewBox="0 0 56 56">
+                <circle cx="28" cy="28" r="25" fill="rgba(34,197,94,.1)" stroke="#22C55E" stroke-width="2.5" opacity=".3"/>
+                <circle cx="28" cy="28" r="25" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-dasharray="157" stroke-dashoffset="157" stroke-linecap="round" style="animation:checkCircle .6s ease-out forwards"/>
+                <path d="M16 30 L24 38 L40 20" fill="none" stroke="#22C55E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="40" stroke-dashoffset="40" style="animation:checkMark .4s ease-out .5s forwards"/>
+            </svg>
+        </div>
+        <!-- Neuron + X vermelho (deletar) -->
+        <div id="s6Deletar" class="hidden flex items-center justify-center gap-4">
+            <svg width="80" height="80" viewBox="0 0 80 80" class="pulse-anim">
+                <circle cx="40" cy="40" r="18" fill="url(#ng6d)" stroke="#5B8DEF" stroke-width="2" opacity=".5"/>
+                <circle cx="40" cy="40" r="7" fill="#5B8DEF" opacity=".4"/>
+                <line x1="40" y1="22" x2="40" y2="10" stroke="#5B8DEF" stroke-width="1.5" opacity=".3"/>
+                <line x1="25" y1="30" x2="15" y2="20" stroke="#5B8DEF" stroke-width="1.5" opacity=".3"/>
+                <line x1="55" y1="30" x2="65" y2="20" stroke="#5B8DEF" stroke-width="1.5" opacity=".3"/>
+                <defs><radialGradient id="ng6d" cx="40%" cy="40%"><stop offset="0%" stop-color="#1E4FAF" stop-opacity=".5"/><stop offset="100%" stop-color="#0D2B6B" stop-opacity=".3"/></radialGradient></defs>
+            </svg>
+            <svg width="56" height="56" viewBox="0 0 56 56">
+                <circle cx="28" cy="28" r="25" fill="rgba(239,68,68,.1)" stroke="#EF4444" stroke-width="2.5" opacity=".3"/>
+                <circle cx="28" cy="28" r="25" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-dasharray="157" stroke-dashoffset="157" stroke-linecap="round" style="animation:checkCircle .6s ease-out forwards"/>
+                <path d="M19 19 L37 37" fill="none" stroke="#EF4444" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="25" stroke-dashoffset="25" style="animation:checkMark .3s ease-out .4s forwards"/>
+                <path d="M37 19 L19 37" fill="none" stroke="#EF4444" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="25" stroke-dashoffset="25" style="animation:checkMark .3s ease-out .6s forwards"/>
+            </svg>
+        </div>
+        <p id="s6Frase" class="text-lg font-extrabold text-sn-200 mt-3 text-center"></p>
+        <p id="s6Info" class="text-sm text-sn-400 mt-2 text-center font-medium"></p>
+    </div>
+    <div id="s6BtnsSalvar" class="grid grid-cols-3 gap-3 hidden">
+        <button onclick="abrirNotaSalva()" class="bo obsidian-btn py-3 text-xs flex flex-col items-center gap-1"><span class="text-lg">&#128194;</span>Abrir</button>
+        <button onclick="voltarInicio()" class="btn-back text-xs flex flex-col items-center gap-1"><span class="back-dot"></span>Inicio</button>
+        <button onclick="voltarEditar()" class="bo py-3 text-xs flex flex-col items-center gap-1"><span class="text-lg">&#9998;</span>Editar</button>
+    </div>
+    <div id="s6BtnsDeletar" class="hidden text-center">
+        <button onclick="voltarInicio()" class="btn-back"><span class="back-dot"></span>Voltar ao inicio</button>
+    </div>
+</div>
+
+</div><!-- card -->
+
+<!-- Historico -->
+<div id="histSec" class="card rounded-2xl p-5 mt-4 hidden">
+    <h3 class="text-xs text-sn-400 font-bold uppercase tracking-wider mb-3">Historico recente</h3>
+    <div id="histList" class="space-y-1"></div>
+    <div class="mt-4 pt-3" style="border-top:1px solid rgba(91,141,239,.1)">
+        <button onclick="gerarResumoSemanal()" class="w-full bo py-2.5 text-xs flex items-center justify-center gap-2 opacity-70 hover:opacity-100">
+            <span>&#129504;</span> Gerar revisao semanal com IA
+        </button>
+    </div>
+</div>
+<!-- Config Groq -->
+<div id="groqSec" class="card rounded-2xl p-5 mt-4 hidden">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs text-sn-400 font-bold uppercase tracking-wider">Groq API</h3>
+        <span id="groqStatus" class="text-xs font-semibold"></span>
+    </div>
+    <div class="flex gap-2">
+        <input id="groqKey" type="password" class="flex-1 rounded-lg px-4 py-2.5 text-sm" placeholder="Cole sua API key do Groq aqui...">
+        <button onclick="salvarGroqKey()" class="bo px-4 py-2.5 text-sm whitespace-nowrap">Salvar</button>
+    </div>
+    <p class="text-xs text-sn-500 opacity-40 mt-2">Gratis em console.groq.com &mdash; chave salva localmente</p>
+</div>
+<p class="text-center text-sn-500 text-xs mt-6 opacity-40">&copy; Sinapse&IA &mdash; 100% local, 100% privado</p>
+</div>
+<div id="toastBox" class="fixed top-4 right-4 z-50"></div>
+
+<script>
+let audioPath='',txtPath='',obsPath='',transcrevendo=false;
+const $=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML;};
+const toast=(m,t='info')=>{const c={success:'bg-emerald-900/50 border-emerald-500/30 text-emerald-300',error:'bg-red-900/50 border-red-500/30 text-red-300',warn:'bg-amber-900/50 border-amber-500/30 text-amber-300',info:'bg-blue-900/50 border-blue-500/30 text-blue-300'};const e=document.createElement('div');e.className=`toast ${c[t]} border rounded-lg px-4 py-2.5 text-sm font-semibold mb-2 shadow-lg backdrop-blur-sm`;e.textContent=m;$('toastBox').appendChild(e);setTimeout(()=>e.remove(),3000);};
+const show=id=>{['S0','S1','S2','S3','S4','S6'].forEach(s=>$(s).classList.toggle('hidden',s!==id));};
+
+// Loading
+let lp=0,li=null;
+const startL=(t,b,p,txt,cor)=>{lp=0;$(t).textContent=txt;$(p).textContent='0%';$(b).style.width='0%';$(b).style.background=cor;$(b).style.backgroundSize='200% 100%';clearInterval(li);li=setInterval(()=>{if(lp<90)lp+=(90-lp)*.025;$(b).style.width=lp+'%';$(p).textContent=Math.round(lp)+'%';},400);};
+const stopL=(b,p)=>{clearInterval(li);$(b).style.width='100%';$(p).textContent='100%';};
+
+// Drag global
+document.addEventListener('dragover',e=>{e.preventDefault();if(!$('S0').classList.contains('hidden')){$('dropZone').classList.remove('hidden');$('dropZone').classList.add('drag-over');}});
+document.addEventListener('dragleave',e=>{if(!e.relatedTarget)$('dropZone').classList.add('hidden');});
+document.addEventListener('drop',e=>{e.preventDefault();$('dropZone').classList.remove('drag-over');$('dropZone').classList.add('hidden');if(!$('S0').classList.contains('hidden'))selecionarArquivo();});
+
+// Opcao 1: Arquivo
+async function selecionarArquivo(){
+    const r=await eel.selecionar_arquivo()();
+    if(r){audioPath=r.path;$('arquivoNome').innerHTML='&#127911; '+esc(r.nome);$('arquivoInfo').classList.remove('hidden');$('arquivoInfo').classList.add('fi');$('painelGravar').classList.add('hidden');$('painelTexto').classList.add('hidden');toast('Arquivo selecionado!','success');}
+}
+
+// Opcao 2: Gravar
+function mostrarGravar(){$('painelGravar').classList.toggle('hidden');$('painelTexto').classList.add('hidden');$('arquivoInfo').classList.add('hidden');}
+
+// Opcao 3: Texto
+function mostrarTexto(){$('painelTexto').classList.toggle('hidden');$('painelGravar').classList.add('hidden');$('arquivoInfo').classList.add('hidden');}
+function checarTextoLivre(){
+    const t=$('textoLivre').value.trim();
+    const btn=$('btnFormatarTexto');
+    if(t.length>5&&btn.classList.contains('hidden')){btn.classList.remove('hidden');btn.classList.add('fi');}
+    else if(t.length<=5)btn.classList.add('hidden');
+}
+
+async function formatarTextoDireto(){
+    const t=$('textoLivre').value.trim();if(!t){toast('Cole um texto primeiro.','warn');return;}
+    show('S3');startL('s3lt','s3b','s3p','Formatando com IA...','linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED)');
+    await eel.formatar_texto_direto(t)();
+}
+
+eel.expose(on_texto_direto_concluido);function on_texto_direto_concluido(md,path,nome){
+    stopL('s3b','s3p');
+    $('txRes').value=md;$('txRes').scrollTop=0;$('cc').textContent=md.length+' chars';
+    $('nomeEdit').value=nome;
+    $('actBtns').classList.add('hidden');$('editBtns').classList.add('hidden');$('delBox').classList.add('hidden');
+    $('platformSave').classList.remove('hidden');selecionarPlataforma(plataformaAtiva||'obsidian');
+    setTimeout(()=>show('S4'),500);
+    toast('Formatado! Escolha onde salvar.','success');
+}
+
+async function salvarObsidianComNome(){
+    const c=$('txRes').value;if(!c.trim()){toast('Nada.','warn');return;}
+    const n=$('nomeEdit').value.trim();
+    $('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Salvando no Obsidian...','linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED)');
+    await eel.salvar_obsidian(c,n)();
+}
+async function escolherPastaObsidian(){
+    const r=await eel.escolher_pasta_obsidian()();if(!r)return;
+    const c=$('txRes').value;const n=$('nomeEdit').value.trim();
+    $('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Salvando...','linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED)');
+    await eel.salvar_obsidian_em(c,r,n)();
+}
+
+const frasesSalvar=['Conexao fortalecida!','Sinapse ativada!','Conhecimento conectado!','Nota salva com sucesso!','Rede neural expandida!','Tudo conectado!'];
+const frasesDeletar=['Conexao removida.','Sinapse desconectada.','Nota removida.','Desconectado.','Removido com sucesso.'];
+
+function mostrarConfirmacao(tipo, nome, pathInfo){
+    $('s6Salvar').classList.add('hidden');$('s6Deletar').classList.add('hidden');
+    $('s6BtnsSalvar').classList.add('hidden');$('s6BtnsDeletar').classList.add('hidden');
+    if(tipo==='salvar'){
+        $('s6Salvar').classList.remove('hidden');$('s6BtnsSalvar').classList.remove('hidden');
+        $('s6Frase').textContent=frasesSalvar[Math.floor(Math.random()*frasesSalvar.length)];
+        $('s6Info').textContent='Salvo em: '+pathInfo;
+    } else {
+        $('s6Deletar').classList.remove('hidden');$('s6BtnsDeletar').classList.remove('hidden');
+        $('s6Frase').textContent=frasesDeletar[Math.floor(Math.random()*frasesDeletar.length)];
+        $('s6Info').textContent='Arquivo removido: '+nome;
+    }
+    show('S6');
+}
+
+eel.expose(on_salvar_obs_concluido);function on_salvar_obs_concluido(path,nome){
+    obsPath=path;stopL('alB','alP');$('actLoad').classList.add('hidden');
+    mostrarConfirmacao('salvar',nome,path);
+    carregarHistorico();
+}
+
+function abrirNotaSalva(){if(obsPath)eel.abrir_arquivo(obsPath)();else if(txtPath)eel.abrir_arquivo(txtPath)();}
+
+function voltarEditar(){
+    show('S4');
+    $('actBtns').classList.add('hidden');
+    $('platformSave').classList.add('hidden');
+    $('editBtns').classList.remove('hidden');
+}
+async function salvarAlteracoes(){
+    const conteudo=$('txRes').value;
+    if(!conteudo.trim()){toast('Nada para salvar.','warn');return;}
+    let salvou=false, pathSalvo='';
+    if(obsPath){const r=await eel.atualizar_arquivo(obsPath,conteudo)();if(r){salvou=true;pathSalvo=obsPath;}}
+    if(txtPath){const r=await eel.atualizar_arquivo(txtPath,conteudo)();if(r){salvou=true;if(!pathSalvo)pathSalvo=txtPath;}}
+    if(!salvou){toast('Nenhum arquivo para atualizar. Salve primeiro.','warn');return;}
+    $('editBtns').classList.add('hidden');$('actBtns').classList.remove('hidden');
+    mostrarConfirmacao('salvar',pathSalvo.split(/[/\\]/).pop(),pathSalvo);
+}
+function cancelarEdicao(){
+    $('editBtns').classList.add('hidden');$('actBtns').classList.remove('hidden');
+    show('S6');
+}
+
+// Transcricao
+async function transcrever(){if(transcrevendo)return;if(!audioPath){toast('Selecione um arquivo primeiro.','warn');return;}transcrevendo=true;show('S2');startL('s2lt','s2b','s2p','Carregando modelo...','linear-gradient(90deg,#FFC107,#E5A800,#FFC107)');$('txRes').value='';await eel.transcrever(audioPath)();}
+async function cancelarTranscricao(){await eel.cancelar_transcricao()();toast('Cancelando...','warn');}
+
+eel.expose(on_segmento);function on_segmento(t){const ta=$('txRes');ta.value+=t+'\n';ta.scrollTop=ta.scrollHeight;$('s2lt').textContent='Transcrevendo...';$('s2txt').textContent='Processando conexoes neurais...';$('cc').textContent=ta.value.length+' chars';}
+eel.expose(on_progresso);function on_progresso(n){$('s2lt').textContent=`Transcrevendo... ${n} trechos`;}
+eel.expose(on_concluido);function on_concluido(nome,idioma){transcrevendo=false;stopL('s2b','s2p');$('nomeEdit').value=nome;$('actBtns').classList.remove('hidden');$('platformSave').classList.add('hidden');$('editBtns').classList.add('hidden');$('delBox').classList.add('hidden');setTimeout(()=>{show('S4');if(idioma&&idioma!=='pt')mostrarIdiomaBanner(idioma);},500);toast('Transcricao concluida!','success');carregarHistorico();}
+eel.expose(on_cancelado);function on_cancelado(){transcrevendo=false;show('S0');toast('Cancelada.','warn');}
+eel.expose(on_erro);function on_erro(m){
+    transcrevendo=false;stopL('s2b','s2p');stopL('s3b','s3p');stopL('alB','alP');
+    $('actLoad').classList.add('hidden');
+    const b=$('bObs');if(b){b.disabled=false;$('bObsT').textContent='Obsidian';}
+    if(!$('S2').classList.contains('hidden'))show('S0');
+    else if(!$('S3').classList.contains('hidden')){
+        if($('txRes').value.trim()){$('actBtns').classList.remove('hidden');$('platformSave').classList.add('hidden');show('S4');}
+        else show('S0');
+    }
+    const ml=m&&m.toLowerCase();
+    const msg=(ml&&ml.includes('limite diario'))
+        ?'Limite diario do Groq atingido. O limite de 100k tokens reseta a cada 24h.'
+        :(ml&&(ml.includes('429')||ml.includes('rate limit')||ml.includes('rate_limit')))
+        ?'Limite da API atingido. Aguarde alguns segundos e tente novamente.'
+        :'Erro: '+m;
+    toast(msg,'error');
+}
+eel.expose(on_status);function on_status(m){$('s2lt').textContent=m;$('s2txt').textContent=m;}
+
+// Acoes
+async function copiarTexto(){const t=$('txRes').value;if(!t.trim()){toast('Nada para copiar.','warn');return;}await eel.copiar_texto(t)();toast('Copiado!','success');}
+async function salvarTexto(){const t=$('txRes').value;if(!t.trim()){toast('Nada para salvar.','warn');return;}const n=$('nomeEdit').value.trim();$('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Salvando...','linear-gradient(90deg,#FFC107,#E5A800,#FFC107)');await eel.salvar_texto(t,n)();}
+async function abrirTxt(){if(txtPath)await eel.abrir_arquivo(txtPath)();else toast('Salve primeiro.','warn');}
+eel.expose(on_salvar_concluido);function on_salvar_concluido(p,n){txtPath=p;stopL('alB','alP');$('actLoad').classList.add('hidden');mostrarConfirmacao('salvar',n,p);carregarHistorico();}
+
+// Excluir
+function excluirNota(){$('actBtns').classList.add('hidden');$('platformSave').classList.add('hidden');$('delBox').classList.remove('hidden');$('delBox').classList.add('fi');}
+async function confirmarExcluir(t){
+    let nomeRemovido='';
+    if(t==='obsidian'||t==='ambos'){if(obsPath){nomeRemovido=obsPath.split(/[/\\]/).pop();await eel.excluir_arquivo(obsPath)();obsPath='';}else{toast('Nenhuma nota.','warn');return;}}
+    if(t==='transcricao'||t==='ambos'){if(txtPath){if(!nomeRemovido)nomeRemovido=txtPath.split(/[/\\]/).pop();await eel.excluir_arquivo(txtPath)();txtPath='';}$('txRes').value='';$('cc').textContent='';}
+    $('delBox').classList.add('hidden');$('actBtns').classList.remove('hidden');
+    mostrarConfirmacao('deletar',nomeRemovido||'arquivo','');
+    carregarHistorico();
+}
+function cancelarExcluir(){$('delBox').classList.add('hidden');$('actBtns').classList.remove('hidden');}
+
+// Obsidian
+async function formatarObsidian(){const t=$('txRes').value.trim();if(!t){toast('Nada para formatar.','warn');return;}$('bObs').disabled=true;$('bObsT').textContent='...';show('S3');startL('s3lt','s3b','s3p','Formatando com IA...','linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED)');await eel.formatar_obsidian(t)();}
+eel.expose(on_status_obsidian);function on_status_obsidian(m){$('s3lt').textContent=m;$('s3txt').textContent=m;}
+eel.expose(on_obsidian_formatado);function on_obsidian_formatado(md){stopL('s3b','s3p');$('txRes').value=md;$('txRes').scrollTop=0;$('cc').textContent=md.length+' chars';$('actBtns').classList.add('hidden');$('editBtns').classList.add('hidden');$('delBox').classList.add('hidden');$('platformSave').classList.remove('hidden');selecionarPlataforma('obsidian');setTimeout(()=>show('S4'),500);toast('Formatado!','success');}
+
+function voltarInicio(){
+    txtPath='';obsPath='';audioPath='';transcrevendo=false;plataformaAtiva='obsidian';idiomaDetectado='';
+    $('idiomaBanner').classList.add('hidden');
+    $('arquivoInfo').classList.add('hidden');
+    $('painelGravar').classList.add('hidden');
+    $('painelTexto').classList.add('hidden');
+    $('dropZone').classList.add('hidden');
+    $('platformSave').classList.add('hidden');
+    $('delBox').classList.add('hidden');
+    $('editBtns').classList.add('hidden');
+    $('actLoad').classList.add('hidden');
+    $('actBtns').classList.remove('hidden');
+    $('btnFormatarTexto').classList.add('hidden');
+    $('textoLivre').value='';
+    $('txRes').value='';
+    $('nomeEdit').value='';
+    $('cc').textContent='';
+    const dz=$('dropZone');dz.classList.remove('ok','has-file','drag-over');
+    const b=$('bObs');if(b){b.disabled=false;$('bObsT').textContent='Obsidian';}
+    show('S0');
+}
+
+// Historico
+async function carregarHistorico(){const h=await eel.carregar_historico()();const s=$('histSec'),l=$('histList');if(h&&h.length>0){s.classList.remove('hidden');l.innerHTML='';h.forEach(i=>{const d=document.createElement('div');d.className='hi flex items-center justify-between py-2.5 px-3 cursor-pointer';d.onclick=()=>abrirDoHistorico(i);const ic={obsidian:'&#129504;',logseq:'&#128203;',notion:'&#128196;',roam:'&#128279;'}[i.tipo]||'&#127911;';d.innerHTML=`<div class="flex items-center gap-3 min-w-0"><span class="text-au-500 text-base">${ic}</span><div class="min-w-0"><p class="text-sm text-sn-200 font-semibold truncate">${esc(i.nome)}</p><p class="text-xs text-sn-500 opacity-60">${esc(i.data)}</p></div></div><span class="text-sn-500 text-xs">&#8250;</span>`;l.appendChild(d);});}else s.classList.add('hidden');}
+
+async function abrirDoHistorico(item){
+    if(!item.path)return;
+    const r=await eel.ler_conteudo_arquivo(item.path)();
+    if(!r){toast('Arquivo nao encontrado.','error');return;}
+    $('txRes').value=r.conteudo;$('txRes').scrollTop=0;
+    $('cc').textContent=r.conteudo.length+' chars';
+    const nome=r.nome.replace(/\.(md|txt)$/,'');
+    $('nomeEdit').value=nome;
+    if(item.tipo==='obsidian'||item.tipo==='logseq'){obsPath=r.path;txtPath='';}else if(item.tipo==='notion'){obsPath=r.path;txtPath='';}else{txtPath=r.path;obsPath='';}
+    $('platformSave').classList.add('hidden');$('editBtns').classList.add('hidden');$('delBox').classList.add('hidden');$('actBtns').classList.remove('hidden');
+    show('S4');
+}
+
+// Gravacao
+let grav=false,rInt=null;
+(function(){const v=$('audioViz');for(let i=0;i<30;i++){const b=document.createElement('div');const c=['#5B8DEF','#3A6FD8','#FFC107','#3A6FD8','#5B8DEF'];b.style.cssText=`width:5px;border-radius:3px;background:${c[i%5]};transition:height .1s;height:3px`;b.className='vb';v.appendChild(b);}})();
+const vBars=document.querySelectorAll('.vb');let vH=new Array(vBars.length).fill(0);
+eel.expose(on_nivel_audio);function on_nivel_audio(n){vH.push(n);if(vH.length>vBars.length)vH.shift();vBars.forEach((b,i)=>{const v=vH[i]||0;b.style.height=Math.max(3,v*56*(.7+Math.random()*.6))+'px';b.style.opacity=.5+v*.5;});}
+
+async function iniciarGravacao(){const d=$('deviceSelect').value;if(!d){toast('Nenhum dispositivo de audio disponivel.','warn');return;}grav=true;show('S1');vH=new Array(vBars.length).fill(0);$('recTimer').textContent='00:00';rInt=setInterval(async()=>{const s=await eel.get_tempo_gravacao()();$('recTimer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},1000);await eel.iniciar_gravacao(d)();}
+async function pausarGravacao(){const p=await eel.pausar_gravacao()();$('piIco').innerHTML=p?'&#9654;':'&#9208;';$('piTxt').textContent=p?'Retomar':'Pausar';}
+async function pararGravacao(){grav=false;clearInterval(rInt);await eel.parar_gravacao()();}
+async function cancelarGravacao(){grav=false;clearInterval(rInt);await eel.cancelar_gravacao()();show('S0');toast('Gravacao cancelada.','warn');}
+eel.expose(on_gravacao_concluida);function on_gravacao_concluida(p,n){audioPath=p;show('S0');$('arquivoNome').innerHTML='&#127908; '+esc(n);$('arquivoInfo').classList.remove('hidden');$('arquivoInfo').classList.add('fi');$('painelGravar').classList.add('hidden');toast('Gravacao salva! Clique em Transcrever.','success');}
+
+async function carregarDispositivos(){const d=await eel.listar_dispositivos()();const s=$('deviceSelect');s.innerHTML='';if(!d||!d.length){s.innerHTML='<option value="">Nenhum dispositivo</option>';return;}d.forEach(v=>{const o=document.createElement('option');o.value=v.id;o.textContent=v.nome;s.appendChild(o);});}
+
+// Seletor de idioma
+const IDIOMAS={pt:{nome:'Português'},en:{nome:'English'},es:{nome:'Español'},zh:{nome:'中文'},hi:{nome:'हिन्दी'},ar:{nome:'عربي'},fr:{nome:'Français'}};
+let idiomaDetectado='';
+function mostrarIdiomaBanner(codigo){
+    idiomaDetectado=codigo;
+    const info=IDIOMAS[codigo]||{nome:codigo};
+    $('idiomaDetNome').textContent=info.nome;
+    $('idiomaBanner').classList.remove('hidden');
+}
+function dispensarIdiomaBanner(){$('idiomaBanner').classList.add('hidden');}
+async function traduzirTranscricao(codigo){
+    if(codigo===idiomaDetectado){dispensarIdiomaBanner();return;}
+    const texto=$('txRes').value;if(!texto.trim())return;
+    const nome=IDIOMAS[codigo]?.nome||codigo;
+    dispensarIdiomaBanner();
+    $('actLoad').classList.remove('hidden');
+    startL('alTxt','alB','alP','Traduzindo para '+nome+'...','linear-gradient(90deg,#5B8DEF,#8FB2FF,#5B8DEF)');
+    const resultado=await eel.traduzir_para(texto,codigo)();
+    stopL('alB','alP');$('actLoad').classList.add('hidden');
+    if(resultado){$('txRes').value=resultado;$('cc').textContent=resultado.length+' chars';toast('Traduzido para '+nome+'!','success');}
+    else toast('Erro na traducao. Verifique sua API key.','error');
+}
+
+// Resumo Semanal
+async function gerarResumoSemanal(){
+    show('S3');startL('s3lt','s3b','s3p','Gerando revisao semanal...','linear-gradient(90deg,#7C3AED,#a78bfa,#7C3AED)');
+    await eel.gerar_resumo_semanal()();
+}
+
+// Groq config
+async function verificarGroqKey(){const t=await eel.tem_groq_key()();const s=$('groqStatus');if(t){s.textContent='Conectada';s.style.color='#4ADE80';$('groqSec').classList.add('hidden');}else{s.textContent='Nao configurada';s.style.color='#f87171';$('groqSec').classList.remove('hidden');}}
+async function salvarGroqKey(){const k=$('groqKey').value.trim();if(!k){toast('Cole a API key.','warn');return;}await eel.salvar_groq_key(k)();$('groqKey').value='';toast('API key salva!','success');verificarGroqKey();}
+
+// Platform selector
+let plataformaAtiva='obsidian';
+const PRO_PLATS=['logseq','notion','roam'];
+async function selecionarPlataforma(id){
+    if(PRO_PLATS.includes(id)){
+        const pro=await eel.tem_pro()();
+        if(!pro){mostrarModalPro(id);return;}
+    }
+    plataformaAtiva=id;
+    const map={obsidian:'obsSave',logseq:'logseqSave',notion:'notionSave',roam:'roamSave'};
+    Object.values(map).forEach(d=>{const el=$(d);if(el)el.classList.toggle('hidden',map[id]!==d);});
+    ['obsidian','logseq','notion','roam'].forEach(p=>{const btn=$('plt-'+p);if(btn)btn.classList.toggle('active',p===id);});
+    if(id==='logseq')carregarLogseqGraphs();
+    if(id==='notion')mostrarNotionSave();
+}
+function mostrarModalPro(plat){
+    const nomes={logseq:'Logseq',notion:'Notion',roam:'Roam Research'};
+    $('proModalPlat').textContent=nomes[plat]||plat;
+    $('proModal').classList.remove('hidden');
+}
+async function ativarChavePro(){
+    const k=$('proKeyInput').value.trim();
+    if(!k){toast('Cole sua chave Pro.','warn');return;}
+    const res=await eel.ativar_pro(k)();
+    if(res&&res.ok){
+        $('proModal').classList.add('hidden');
+        toast(res.aviso?'Pro ativado (offline)!':'Pro ativado!','success');
+    } else {
+        toast((res&&res.erro)||'Chave invalida.','error');
+    }
+}
+
+// Logseq
+async function carregarLogseqGraphs(){
+    const graphs=await eel.detectar_logseq_graphs()();
+    const s=$('logseqSelect');if(!s)return;
+    s.innerHTML='';
+    if(!graphs||!graphs.length){s.innerHTML='<option value="">Nenhum graph encontrado</option>';return;}
+    graphs.forEach(g=>{const o=document.createElement('option');o.value=g.path;o.textContent=g.name;s.appendChild(o);});
+    // persist selection
+    s.addEventListener('change',()=>{if(s.value)eel.selecionar_logseq_graph(s.value)();},{once:true});
+}
+async function salvarLogseqComNome(){
+    const c=$('txRes').value;if(!c.trim()){toast('Nada.','warn');return;}
+    const n=$('nomeEdit').value.trim();
+    const g=$('logseqSelect')&&$('logseqSelect').value;
+    if(g)await eel.selecionar_logseq_graph(g)();
+    $('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Salvando no Logseq...','linear-gradient(90deg,#22C55E,#86efac,#22C55E)');
+    await eel.salvar_logseq(c,n)();
+}
+async function escolherPastaLogseq(){
+    const r=await eel.escolher_pasta_logseq()();if(!r)return;
+    const c=$('txRes').value;const n=$('nomeEdit').value.trim();
+    $('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Salvando no Logseq...','linear-gradient(90deg,#22C55E,#86efac,#22C55E)');
+    await eel.salvar_logseq_em(c,r,n)();
+}
+
+// Notion
+async function mostrarNotionSave(){
+    const ok=await eel.tem_notion_config()();
+    $('notionConfigForm').classList.toggle('hidden',ok);
+    $('notionSaveBtn').classList.toggle('hidden',!ok);
+}
+async function salvarConfigNotion(){
+    const t=$('notionToken').value.trim();const p=$('notionParentId').value.trim();
+    if(!t||!p){toast('Preencha token e ID da pagina pai.','warn');return;}
+    await eel.salvar_notion_config(t,p)();
+    $('notionToken').value='';$('notionParentId').value='';
+    $('notionConfigForm').classList.add('hidden');$('notionSaveBtn').classList.remove('hidden');
+    toast('Notion configurado!','success');
+}
+function reconfigurarNotion(){$('notionSaveBtn').classList.add('hidden');$('notionConfigForm').classList.remove('hidden');}
+async function salvarNotionComNome(){
+    const c=$('txRes').value;if(!c.trim()){toast('Nada.','warn');return;}
+    const n=$('nomeEdit').value.trim();
+    $('actLoad').classList.remove('hidden');startL('alTxt','alB','alP','Enviando para o Notion...','linear-gradient(90deg,#6b7280,#d1d5db,#6b7280)');
+    await eel.salvar_notion(c,n)();
+}
+eel.expose(on_salvar_notion_concluido);function on_salvar_notion_concluido(url,nome){
+    obsPath=url;stopL('alB','alP');$('actLoad').classList.add('hidden');
+    mostrarConfirmacao('salvar',nome,url||'Salvo no Notion!');
+    carregarHistorico();
+}
+
+// Vault selector
+async function carregarVaults(){
+    const vaults=await eel.detectar_vaults()();
+    const s=$('vaultSelect');if(!s)return;
+    s.innerHTML='';
+    if(!vaults||!vaults.length){s.innerHTML='<option value="">Nenhum vault encontrado</option>';return;}
+    vaults.forEach(v=>{const o=document.createElement('option');o.value=v.path;o.textContent=v.name;s.appendChild(o);});
+}
+async function onVaultChange(){
+    const s=$('vaultSelect');if(s&&s.value)await eel.selecionar_vault(s.value)();
+}
+if($('vaultSelect'))$('vaultSelect').addEventListener('change',onVaultChange);
+
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+    // Ctrl+Enter: transcrever (S0 com arquivo) ou formatar (S4)
+    if(e.ctrlKey&&e.key==='Enter'){
+        e.preventDefault();
+        if(!$('S0').classList.contains('hidden')){
+            if(!$('arquivoInfo').classList.contains('hidden'))transcrever();
+            else if(!$('painelTexto').classList.contains('hidden'))formatarTextoDireto();
+        }else if(!$('S4').classList.contains('hidden')){
+            if(!$('obsSave').classList.contains('hidden'))salvarObsidianComNome();
+        }
+    }
+    // Ctrl+S: salvar (S4)
+    if(e.ctrlKey&&e.key==='s'){
+        e.preventDefault();
+        if(!$('S4').classList.contains('hidden')){
+            if(!$('obsSave').classList.contains('hidden'))salvarObsidianComNome();
+            else salvarTexto();
+        }
+    }
+    // Esc: cancelar/voltar
+    if(e.key==='Escape'){
+        if(!$('S1').classList.contains('hidden'))cancelarGravacao();
+        else if(!$('S2').classList.contains('hidden'))cancelarTranscricao();
+        else if(!$('S4').classList.contains('hidden'))voltarInicio();
+        else if(!$('S6').classList.contains('hidden'))voltarInicio();
+    }
+});
+
+// Onboarding
+async function verificarOnboarding(){
+    const first=await eel.is_first_run()();
+    if(first)$('onboarding').classList.remove('hidden');
+}
+function onboardingNext(step){
+    document.querySelectorAll('.ob-step').forEach(s=>s.classList.add('hidden'));
+    $('ob'+step).classList.remove('hidden');
+}
+async function finalizarOnboarding(){
+    const k=$('obGroqKey').value.trim();
+    if(k)await eel.salvar_groq_key(k)();
+    await eel.mark_onboarding_done()();
+    $('onboarding').classList.add('hidden');
+    verificarGroqKey();
+    carregarVaults();
+}
+
+window.addEventListener('load',()=>{carregarHistorico();carregarDispositivos();verificarGroqKey();carregarVaults();carregarLogseqGraphs();verificarOnboarding();});
+</script>
+
+<!-- ===== PRO MODAL ===== -->
+<div id="proModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(6,15,42,.92);backdrop-filter:blur(8px)">
+<div class="card rounded-2xl p-6 w-full max-w-sm mx-4 space-y-5">
+    <div class="text-center space-y-1">
+        <p class="text-3xl">&#9889;</p>
+        <h3 class="text-xl font-extrabold text-sn-200"><span id="proModalPlat">Logseq</span> &mdash; Plano Pro</h3>
+        <p class="text-sm text-sn-400">Logseq, Notion e Roam sao exclusivos do plano Pro.</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl p-4 space-y-2 text-center" style="border:1px solid rgba(91,141,239,.2);background:rgba(91,141,239,.05)">
+            <p class="text-xs font-bold text-sn-400 uppercase tracking-wider">Free</p>
+            <p class="text-2xl font-black text-sn-200">R$0</p>
+            <div class="text-xs text-sn-400 space-y-1 text-left">
+                <p>&#10003; Transcricao ilimitada</p>
+                <p>&#10003; Formatacao IA</p>
+                <p>&#10003; Obsidian</p>
+                <p>&#10003; Wikilinks automaticos</p>
+                <p>&#10003; Resumo semanal</p>
+            </div>
+        </div>
+        <div class="rounded-xl p-4 space-y-2 text-center" style="border:1px solid rgba(255,193,7,.35);background:rgba(255,193,7,.06)">
+            <p class="text-xs font-bold text-au-500 uppercase tracking-wider">Pro</p>
+            <p class="text-2xl font-black text-au-400">R$19<span class="text-sm font-medium opacity-60">/mes</span></p>
+            <div class="text-xs text-sn-300 space-y-1 text-left">
+                <p>&#10003; Tudo do Free</p>
+                <p class="text-au-400 font-semibold">&#10003; Logseq</p>
+                <p class="text-au-400 font-semibold">&#10003; Notion API</p>
+                <p class="text-au-400 font-semibold">&#10003; Roam Research</p>
+                <p class="text-au-400 font-semibold">&#10003; Suporte prioritario</p>
+            </div>
+        </div>
+    </div>
+    <div class="space-y-2">
+        <input id="proKeyInput" type="text" class="w-full rounded-lg px-4 py-2.5 text-sm text-center font-mono tracking-widest" placeholder="SINAPSE-XXXX-XXXX-XXXX">
+        <button onclick="ativarChavePro()" class="bs w-full py-2.5 text-sm">&#128274; Ativar chave Pro</button>
+        <button onclick="$('proModal').classList.add('hidden')" class="bo w-full py-2 text-xs opacity-60">Agora nao</button>
+    </div>
+</div>
+</div>
+
+<!-- ===== ONBOARDING OVERLAY ===== -->
+<div id="onboarding" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(6,15,42,.92);backdrop-filter:blur(8px)">
+<div class="w-full max-w-md mx-4">
+    <!-- Step 1: Welcome -->
+    <div id="ob1" class="ob-step text-center space-y-6">
+        <svg viewBox="0 0 80 80" class="w-24 h-24 mx-auto pulse-anim">
+            <circle cx="40" cy="40" r="16" fill="url(#neuronGrad)" stroke="#FFC107" stroke-width="1.5"/>
+            <line x1="40" y1="24" x2="40" y2="8" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+            <line x1="26" y1="30" x2="14" y2="18" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+            <line x1="54" y1="30" x2="66" y2="18" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+            <line x1="26" y1="50" x2="12" y2="60" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+            <line x1="54" y1="50" x2="68" y2="60" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+            <line x1="40" y1="56" x2="40" y2="72" stroke="#5B8DEF" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+            <circle cx="40" cy="8" r="3" fill="#FFC107" opacity=".8"/>
+            <circle cx="14" cy="18" r="2.5" fill="#FFC107" opacity=".6"/>
+            <circle cx="66" cy="18" r="2.5" fill="#FFC107" opacity=".6"/>
+            <circle cx="12" cy="60" r="2.5" fill="#FFC107" opacity=".5"/>
+            <circle cx="68" cy="60" r="2.5" fill="#FFC107" opacity=".5"/>
+            <circle cx="40" cy="72" r="3" fill="#FFC107" opacity=".8"/>
+            <circle cx="40" cy="40" r="6" fill="#FFC107" opacity=".9"/>
+        </svg>
+        <h2 class="text-2xl font-extrabold text-sn-200">Bem-vindo ao <span class="text-au-500">Sinapse&IA</span></h2>
+        <p class="text-sn-400 text-sm">Fortaleca as conexoes do seu segundo cerebro.<br>Vamos configurar tudo em 30 segundos.</p>
+        <button onclick="onboardingNext(2)" class="bs py-3 px-10 text-sm mx-auto">Comecar &#10132;</button>
+    </div>
+    <!-- Step 2: Groq Key -->
+    <div id="ob2" class="ob-step hidden space-y-5">
+        <h3 class="text-xl font-bold text-sn-200 text-center">Configurar IA</h3>
+        <p class="text-sn-400 text-sm text-center">O Sinapse&IA usa o Groq para formatar suas notas com inteligencia artificial. E gratuito!</p>
+        <div class="space-y-2">
+            <label class="text-xs text-sn-400 font-bold uppercase tracking-wider">API Key do Groq</label>
+            <input id="obGroqKey" type="password" class="w-full rounded-lg px-4 py-3 text-sm" placeholder="Cole sua key de console.groq.com...">
+            <p class="text-xs text-sn-500 opacity-50">Gratis em <span class="text-au-500">console.groq.com</span> &mdash; salva apenas localmente</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="onboardingNext(1)" class="bo py-3 text-sm">&#8592; Voltar</button>
+            <button onclick="onboardingNext(3)" class="bs py-3 text-sm">Proximo &#10132;</button>
+        </div>
+    </div>
+    <!-- Step 3: Quick tips -->
+    <div id="ob3" class="ob-step hidden space-y-5">
+        <h3 class="text-xl font-bold text-sn-200 text-center">Dicas rapidas</h3>
+        <div class="space-y-3 text-sm text-sn-300">
+            <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(91,141,239,.08)">
+                <span class="text-au-500 text-lg">&#9000;</span>
+                <div><strong class="text-sn-200">Ctrl+Enter</strong> &mdash; Transcrever ou formatar</div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(91,141,239,.08)">
+                <span class="text-au-500 text-lg">&#128190;</span>
+                <div><strong class="text-sn-200">Ctrl+S</strong> &mdash; Salvar nota</div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(91,141,239,.08)">
+                <span class="text-au-500 text-lg">&#9099;</span>
+                <div><strong class="text-sn-200">Esc</strong> &mdash; Cancelar ou voltar</div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(91,141,239,.08)">
+                <span class="text-au-500 text-lg">&#128194;</span>
+                <div><strong class="text-sn-200">Arraste arquivos</strong> &mdash; Solte direto na tela</div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="onboardingNext(2)" class="bo py-3 text-sm">&#8592; Voltar</button>
+            <button onclick="finalizarOnboarding()" class="bs py-3 text-sm">&#10003; Pronto!</button>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

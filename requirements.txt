@@ -1,0 +1,5 @@
+Eel>=0.16
+faster-whisper>=1.0
+SoundCard>=0.4
+soundfile>=0.12
+numpy>=2.0
