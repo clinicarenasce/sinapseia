@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sinapse&amp;IA — Transcreva. Organize. Pense melhor.</title>
+  <meta name="description" content="Transforme qualquer áudio em nota estruturada com IA em segundos. Integração nativa com Obsidian, Notion e Logseq. 100% local, 100% privado." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  NAV                                                                     -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<nav id="nav">
+  <a class="nav-logo" href="#">Sinapse<span>&amp;IA</span></a>
+  <div class="nav-links">
+    <a href="#como">Como funciona</a>
+    <a href="#features">Funcionalidades</a>
+    <a href="#integracoes">Integrações</a>
+    <a href="#planos">Planos</a>
+    <a href="#download" class="nav-cta">Baixar grátis</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  HERO                                                                    -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <canvas id="neural" aria-hidden="true"></canvas>
+
+  <div class="hero-badge">Versão 1.0 disponível agora</div>
+
+  <h1>
+    Sua voz.<br />
+    Sua ideia.<br />
+    <span class="gradient-text">No seu segundo cérebro.</span>
+  </h1>
+
+  <p>
+    Transcreva qualquer áudio com IA local. Receba uma nota formatada com tags,
+    wikilinks e frontmatter YAML. Salva direto no seu vault — sem nuvem, sem
+    assinatura obrigatória.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#download" class="btn-primary">↓ Baixar para Windows — grátis</a>
+    <a href="#como" class="btn-secondary">Ver como funciona</a>
+  </div>
+
+  <!-- floating cards abaixo do CTA -->
+  <div class="hero-card">
+    <div class="h-card">
+      <div class="h-card-icon blue">🎙️</div>
+      <div>
+        <strong>Transcrevendo…</strong>
+        <span>reuniao-produto.mp4 · 98% preciso</span>
+      </div>
+    </div>
+    <div class="h-card">
+      <div class="h-card-icon gold">🧠</div>
+      <div>
+        <strong>IA formatando nota</strong>
+        <span>Tags · Wikilinks · YAML</span>
+      </div>
+    </div>
+    <div class="h-card">
+      <div class="h-card-icon green">💎</div>
+      <div>
+        <strong>Salvo no Obsidian</strong>
+        <span>vault/pages/reuniao-produto.md</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  STATS                                                                   -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div id="stats">
+  <div class="stat-item c-blue fade-up">
+    <span class="stat-num" data-count="1200" data-suffix="+">0+</span>
+    <span class="stat-label">horas transcritas</span>
+  </div>
+  <div class="stat-item c-gold fade-up">
+    <span class="stat-num" data-count="98" data-suffix="%">0%</span>
+    <span class="stat-label">precisão média</span>
+  </div>
+  <div class="stat-item c-green fade-up">
+    <span class="stat-num" data-count="28" data-suffix="s">0s</span>
+    <span class="stat-label">tempo médio por min de áudio</span>
+  </div>
+  <div class="stat-item c-purple fade-up">
+    <span class="stat-num">5</span>
+    <span class="stat-label">idiomas suportados</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  COMO FUNCIONA                                                           -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="como">
+  <div class="center fade-up">
+    <div class="section-tag">Como funciona</div>
+    <h2 class="section-title">Três passos. Do áudio à nota.</h2>
+    <p class="section-sub">
+      Sem configuração complexa, sem conta obrigatória. Abre, grava ou seleciona um arquivo, e a IA faz o resto.
+    </p>
+  </div>
+
+  <div class="steps-grid">
+    <div class="step-card fade-up">
+      <div class="step-bubble s1">
+        🎙️
+        <span class="step-n">1</span>
+      </div>
+      <h3>Selecione ou grave</h3>
+      <p>
+        Arraste qualquer MP3, MP4, WAV ou OGG — ou grave diretamente
+        do microfone com um clique. Também importa legendas .SRT e .VTT.
+      </p>
+    </div>
+
+    <div class="step-card fade-up">
+      <div class="step-bubble s2">
+        🧠
+        <span class="step-n">2</span>
+      </div>
+      <h3>A IA transcreve e organiza</h3>
+      <p>
+        Whisper large-v3-turbo roda 100% local, sem internet. O Groq
+        estrutura o texto em nota Markdown com YAML, tags do seu vault
+        e wikilinks automáticos.
+      </p>
+    </div>
+
+    <div class="step-card fade-up">
+      <div class="step-bubble s3">
+        📂
+        <span class="step-n">3</span>
+      </div>
+      <h3>Salva no seu segundo cérebro</h3>
+      <p>
+        Envie direto para Obsidian, Logseq ou Notion com um clique.
+        Sem copiar e colar. Sem trocar de janela. A nota aparece
+        formatada no lugar certo.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  FEATURES — BENTO GRID                                                   -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="features">
+  <div class="fade-up">
+    <div class="section-tag">Funcionalidades</div>
+    <h2 class="section-title">Construído para quem pensa em sistemas.</h2>
+    <p class="section-sub">
+      Cada detalhe foi pensado para quem usa PKM de verdade — não uma
+      ferramenta de transcrição genérica com um botão "salvar em notas".
+    </p>
+  </div>
+
+  <div class="bento">
+
+    <!-- Card 1: Transcrição local — waveform animado -->
+    <div class="b-card span-7 acc-blue fade-up">
+      <div class="b-card-tag blue">⚡ Transcrição Local</div>
+      <h3>Roda na sua máquina. Sem esperar nuvem.</h3>
+      <p>
+        Whisper large-v3-turbo processa o áudio localmente. Seus arquivos
+        nunca saem do seu computador. Sem limite de uso. Sem custo por minuto.
+        Funciona sem internet após a instalação.
+      </p>
+      <div class="waveform" aria-hidden="true">
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+        <div class="waveform-bar"></div><div class="waveform-bar"></div>
+      </div>
+      <small style="color:var(--muted);font-size:0.75rem">reuniao-produto.mp4 · 47min · transcrito em 22s</small>
+    </div>
+
+    <!-- Card 2: Tags inteligentes -->
+    <div class="b-card span-5 acc-gold fade-up">
+      <div class="b-card-tag gold">🏷️ Tags Inteligentes</div>
+      <h3>As suas tags. Não as da IA.</h3>
+      <p>
+        Lê as tags que você já usa no seu vault e prioriza as mais
+        relevantes — mantendo consistência sem você precisar lembrar
+        de nada.
+      </p>
+      <div class="tag-cloud">
+        <span class="tag-pill a">#produto</span>
+        <span class="tag-pill b">#ia</span>
+        <span class="tag-pill c">#design</span>
+        <span class="tag-pill a">#reunião</span>
+        <span class="tag-pill d">#pkm</span>
+        <span class="tag-pill b">#estratégia</span>
+        <span class="tag-pill c">#UX</span>
+        <span class="tag-pill a">#roadmap</span>
+      </div>
+    </div>
+
+    <!-- Card 3: Wikilinks automáticos -->
+    <div class="b-card span-5 acc-purple fade-up">
+      <div class="b-card-tag purple">🔗 Wikilinks</div>
+      <h3>Conecta o que você sabe.</h3>
+      <p>
+        Conceitos identificados no texto viram <code style="font-size:0.8em;background:rgba(91,141,239,0.15);padding:1px 5px;border-radius:4px">[[wikilinks]]</code> automaticamente.
+        Stubs criados para links ainda inexistentes no vault.
+      </p>
+      <div class="wiki-graph" aria-hidden="true">
+        <svg class="wiki-svg">
+          <line x1="50%" y1="62" x2="20%" y2="22" stroke="rgba(167,139,250,0.3)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="50%" y1="62" x2="80%" y2="22" stroke="rgba(255,193,7,0.3)"   stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="50%" y1="62" x2="14%" y2="100" stroke="rgba(52,211,153,0.3)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="50%" y1="62" x2="86%" y2="100" stroke="rgba(91,141,239,0.3)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+        <span class="wiki-node center">[[reunião-produto]]</span>
+        <span class="wiki-node n1">[[roadmap Q3]]</span>
+        <span class="wiki-node n2">[[design system]]</span>
+        <span class="wiki-node n3">[[OKRs 2025]]</span>
+        <span class="wiki-node n4">[[backlog]]</span>
+      </div>
+    </div>
+
+    <!-- Card 4: Precisão por idioma — mini gráfico de barras -->
+    <div class="b-card span-7 acc-gold fade-up">
+      <div class="b-card-tag gold">🌐 Multidioma</div>
+      <h3>Detecta o idioma. Você escolhe a nota.</h3>
+      <p>
+        Se o áudio não for em português, um seletor aparece automaticamente
+        oferecendo tradução. Escolha o idioma, a IA traduz sem re-transcrever.
+      </p>
+      <div class="acc-chart">
+        <div class="acc-row">
+          <span class="acc-label">Português</span>
+          <div class="acc-track"><div class="acc-fill blue" style="width:98%"></div></div>
+          <span class="acc-pct">98%</span>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Inglês</span>
+          <div class="acc-track"><div class="acc-fill blue" style="width:97%"></div></div>
+          <span class="acc-pct">97%</span>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Espanhol</span>
+          <div class="acc-track"><div class="acc-fill green" style="width:95%"></div></div>
+          <span class="acc-pct">95%</span>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Francês</span>
+          <div class="acc-track"><div class="acc-fill green" style="width:94%"></div></div>
+          <span class="acc-pct">94%</span>
+        </div>
+        <div class="acc-row">
+          <span class="acc-label">Mandarim</span>
+          <div class="acc-track"><div class="acc-fill purple" style="width:91%"></div></div>
+          <span class="acc-pct">91%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Resumo semanal — timeline -->
+
+    <div class="b-card span-12 acc-green fade-up">
+      <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px">
+          <div class="b-card-tag green">📅 Resumo Semanal</div>
+          <h3>Sua semana inteira, destilada em uma nota.</h3>
+          <p>
+            No final da semana, a IA lê suas últimas notas e gera uma revisão
+            automática com conexões entre tópicos, insights e próximas ações.
+            Como um PKM review — sem esforço manual.
+          </p>
+        </div>
+        <div style="flex:1;min-width:280px">
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">Semana de 31 mar – 6 abr</div>
+          <div class="week-timeline" aria-hidden="true">
+            <div class="week-day">
+              <div class="week-dot"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:8px"></div>
+              </div>
+              <span>Seg</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot active"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:14px"></div>
+                <div class="week-bar gold" style="height:8px"></div>
+              </div>
+              <span>Ter</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:8px"></div>
+              </div>
+              <span>Qua</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot active"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:20px"></div>
+                <div class="week-bar gold" style="height:8px"></div>
+                <div class="week-bar" style="height:8px"></div>
+              </div>
+              <span>Qui</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:8px"></div>
+              </div>
+              <span>Sex</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot active"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar gold" style="height:12px"></div>
+              </div>
+              <span>Sáb</span>
+            </div>
+            <div class="week-day">
+              <div class="week-dot"></div>
+              <div class="week-bar-wrap"></div>
+              <span>Dom</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:12px 16px">
+            <div style="font-size:0.75rem;color:var(--green);font-weight:700;margin-bottom:4px">✦ Resumo gerado</div>
+            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5">6 notas · 3 conexões identificadas · 2 ações sugeridas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /bento -->
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  INTEGRAÇÕES                                                              -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="integracoes">
+  <div class="center fade-up">
+    <div class="section-tag">Integrações</div>
+    <h2 class="section-title">Salva onde você já pensa.</h2>
+    <p class="section-sub">
+      Não importa onde fica o seu segundo cérebro — Sinapse&amp;IA fala
+      a língua do seu sistema.
+    </p>
+  </div>
+
+  <div class="integ-grid">
+
+    <!-- Obsidian -->
+    <div class="integ-card obs fade-up">
+      <div class="integ-icon">
+        <!-- diamond SVG -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 3 L29 12 L22 29 L10 29 L3 12 Z" fill="rgba(124,58,237,0.6)" stroke="#7C3AED" stroke-width="1.5"/>
+          <path d="M16 3 L22 12 L16 20 L10 12 Z" fill="rgba(167,139,250,0.5)"/>
+        </svg>
+      </div>
+      <h3>Obsidian</h3>
+      <p>Detecta seus vaults automaticamente. Salva no formato certo, com tags e wikilinks do seu grafo.</p>
+      <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:0.7rem;background:rgba(124,58,237,0.12);color:#A78BFA;border:1px solid rgba(124,58,237,0.2);padding:3px 9px;border-radius:99px">YAML frontmatter</span>
+        <span style="font-size:0.7rem;background:rgba(124,58,237,0.12);color:#A78BFA;border:1px solid rgba(124,58,237,0.2);padding:3px 9px;border-radius:99px">Auto-vault detect</span>
+      </div>
+    </div>
+
+    <!-- Logseq -->
+    <div class="integ-card lseq fade-up">
+      <span class="badge-pro">Pro</span>
+      <div class="integ-icon">
+        <!-- 3 círculos conectados -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="8"  r="5" fill="rgba(34,197,94,0.5)" stroke="#22C55E" stroke-width="1.5"/>
+          <circle cx="8"  cy="24" r="5" fill="rgba(34,197,94,0.3)" stroke="#22C55E" stroke-width="1.5"/>
+          <circle cx="24" cy="24" r="5" fill="rgba(34,197,94,0.3)" stroke="#22C55E" stroke-width="1.5"/>
+          <line x1="16" y1="13" x2="10" y2="20" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <line x1="16" y1="13" x2="22" y2="20" stroke="#22C55E" stroke-width="1.5" stroke-dasharray="3 2"/>
+        </svg>
+      </div>
+      <h3>Logseq</h3>
+      <p>Integração com seu grafo. Notas salvas na pasta <code style="font-size:0.8em">pages/</code> com formatação de bullets nativa.</p>
+      <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:0.7rem;background:rgba(34,197,94,0.1);color:#34D399;border:1px solid rgba(34,197,94,0.2);padding:3px 9px;border-radius:99px">Auto-graph detect</span>
+        <span style="font-size:0.7rem;background:rgba(34,197,94,0.1);color:#34D399;border:1px solid rgba(34,197,94,0.2);padding:3px 9px;border-radius:99px">Bullet-first</span>
+      </div>
+    </div>
+
+    <!-- Notion -->
+    <div class="integ-card ntn fade-up">
+      <span class="badge-pro">Pro</span>
+      <div class="integ-icon">
+        <!-- N estilizado -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="4" width="24" height="24" rx="4" fill="rgba(232,238,248,0.08)" stroke="rgba(232,238,248,0.3)" stroke-width="1.5"/>
+          <path d="M10 22 L10 10 L14 10 L22 20 L22 10" stroke="rgba(232,238,248,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <h3>Notion</h3>
+      <p>Cria páginas via API oficial. Markdown convertido para blocos nativos do Notion automaticamente.</p>
+      <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:0.7rem;background:rgba(232,238,248,0.06);color:var(--muted);border:1px solid rgba(232,238,248,0.1);padding:3px 9px;border-radius:99px">API oficial</span>
+        <span style="font-size:0.7rem;background:rgba(232,238,248,0.06);color:var(--muted);border:1px solid rgba(232,238,248,0.1);padding:3px 9px;border-radius:99px">MD → Blocos</span>
+      </div>
+    </div>
+
+    <!-- Roam -->
+    <div class="integ-card roam fade-up">
+      <span class="badge-soon">Em breve</span>
+      <div class="integ-icon">
+        <!-- nó com conexões -->
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="5" fill="rgba(59,130,246,0.5)" stroke="#3B82F6" stroke-width="1.5"/>
+          <circle cx="6"  cy="10" r="3" fill="rgba(59,130,246,0.25)" stroke="#3B82F6" stroke-width="1"/>
+          <circle cx="26" cy="10" r="3" fill="rgba(59,130,246,0.25)" stroke="#3B82F6" stroke-width="1"/>
+          <circle cx="6"  cy="24" r="3" fill="rgba(59,130,246,0.25)" stroke="#3B82F6" stroke-width="1"/>
+          <circle cx="26" cy="24" r="3" fill="rgba(59,130,246,0.25)" stroke="#3B82F6" stroke-width="1"/>
+          <line x1="11" y1="13" x2="8"  y2="12"  stroke="#3B82F6" stroke-width="1" opacity="0.5"/>
+          <line x1="21" y1="13" x2="24" y2="12"  stroke="#3B82F6" stroke-width="1" opacity="0.5"/>
+          <line x1="11" y1="19" x2="8"  y2="22"  stroke="#3B82F6" stroke-width="1" opacity="0.5"/>
+          <line x1="21" y1="19" x2="24" y2="22"  stroke="#3B82F6" stroke-width="1" opacity="0.5"/>
+        </svg>
+      </div>
+      <h3>Roam Research</h3>
+      <p>Integração nativa com grafos do Roam. Blocos e referências no formato correto. Em desenvolvimento.</p>
+      <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap">
+        <span style="font-size:0.7rem;background:rgba(59,130,246,0.1);color:#60A5FA;border:1px solid rgba(59,130,246,0.2);padding:3px 9px;border-radius:99px">Block format</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  PLANOS                                                                  -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="planos">
+  <div class="center fade-up">
+    <div class="section-tag">Planos</div>
+    <h2 class="section-title">Comece grátis.<br />Escale quando precisar.</h2>
+    <p class="section-sub">
+      O plano gratuito já é poderoso o suficiente para a maioria.
+      Quando precisar de mais integrações, o Pro cobre tudo.
+    </p>
+  </div>
+
+  <div class="planos-grid">
+
+    <!-- Free -->
+    <div class="plano-card fade-up">
+      <p class="plano-name">Free</p>
+      <p class="plano-price">R$0 <span>/ para sempre</span></p>
+      <p class="plano-desc">Tudo que você precisa para começar a usar PKM de verdade.</p>
+
+      <div class="plano-divider"></div>
+
+      <ul class="plano-feats">
+        <li class="active"><span class="feat-check yes">✓</span> Transcrição ilimitada (local)</li>
+        <li class="active"><span class="feat-check yes">✓</span> Formatação com IA (Groq)</li>
+        <li class="active"><span class="feat-check yes">✓</span> Integração com Obsidian</li>
+        <li class="active"><span class="feat-check yes">✓</span> Wikilinks automáticos</li>
+        <li class="active"><span class="feat-check yes">✓</span> Tags inteligentes do vault</li>
+        <li class="active"><span class="feat-check yes">✓</span> Gravação de áudio</li>
+        <li class="active"><span class="feat-check yes">✓</span> 5 idiomas (PT/EN/ES/FR/ZH)</li>
+        <li class="active"><span class="feat-check yes">✓</span> Histórico de notas</li>
+        <li><span class="feat-check no">—</span> Logseq</li>
+        <li><span class="feat-check no">—</span> Notion</li>
+        <li><span class="feat-check no">—</span> Roam Research</li>
+        <li><span class="feat-check no">—</span> Resumo semanal com IA</li>
+      </ul>
+
+      <a href="#download" class="btn-plano free">Baixar grátis →</a>
+    </div>
+
+    <!-- Pro -->
+    <div class="plano-card destaque fade-up">
+      <span class="plano-badge-top">★ Mais popular</span>
+      <p class="plano-name">Pro</p>
+      <p class="plano-price">R$19 <span>/ mês</span></p>
+      <p class="plano-desc">Para quem leva o segundo cérebro a sério e quer todas as integrações.</p>
+
+      <div class="plano-divider"></div>
+
+      <ul class="plano-feats">
+        <li class="active"><span class="feat-check pro">✓</span> Tudo do Free</li>
+        <li class="active"><span class="feat-check pro">✓</span> Integração com Logseq</li>
+        <li class="active"><span class="feat-check pro">✓</span> Integração com Notion</li>
+        <li class="active"><span class="feat-check pro">✓</span> Integração com Roam Research</li>
+        <li class="active"><span class="feat-check pro">✓</span> Resumo semanal automático</li>
+        <li class="active"><span class="feat-check pro">✓</span> Suporte prioritário</li>
+        <li class="active"><span class="feat-check pro">✓</span> Acesso antecipado a novas features</li>
+      </ul>
+
+      <!-- visual de comparação: barra de valor -->
+      <div style="background:rgba(255,193,7,0.06);border:1px solid rgba(255,193,7,0.15);border-radius:10px;padding:12px 14px;margin-bottom:24px">
+        <div style="font-size:0.72rem;color:var(--gold);font-weight:700;margin-bottom:8px">Valor por transcricao</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.78rem;color:var(--muted)">
+          <span style="width:50px">Free</span>
+          <div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06)">
+            <div style="width:40%;height:100%;border-radius:3px;background:rgba(91,141,239,0.4)"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.78rem;color:var(--muted);margin-top:6px">
+          <span style="width:50px;color:var(--gold)">Pro</span>
+          <div style="flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.06)">
+            <div style="width:100%;height:100%;border-radius:3px;background:linear-gradient(90deg,rgba(255,193,7,0.4),var(--gold))"></div>
+          </div>
+        </div>
+      </div>
+
+      <a href="#download" class="btn-plano pro">Ativar Pro →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  CTA FINAL                                                               -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<section id="download">
+  <div class="section-tag fade-up">Download gratuito</div>
+  <h2 class="fade-up">
+    Pare de perder<br />
+    <span class="gradient-text">o que você pensa.</span>
+  </h2>
+  <p class="fade-up">
+    Cada ideia que você não registra é uma conexão que nunca vai acontecer.
+    Sinapse&amp;IA foi feito para que você nunca perca nenhuma.
+  </p>
+
+  <div class="download-actions fade-up">
+    <a href="#" class="btn-primary">↓ Download para Windows — grátis</a>
+    <a href="#planos" class="btn-secondary">Ver planos</a>
+  </div>
+
+  <p class="download-note fade-up">
+    Windows 10/11 · ~50 MB · Modelo de IA baixado na primeira execução (~1.6 GB) · Sem conta obrigatória
+  </p>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                                  -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<footer>
+  <span>© 2025 Sinapse&amp;IA — Todos os direitos reservados.</span>
+  <div style="display:flex;gap:24px">
+    <a href="#">Privacidade</a>
+    <a href="#">Termos</a>
+    <a href="mailto:contato@sinapseia.app">Contato</a>
+  </div>
+</footer>
+
+<script src="src/main.js"></script>
+</body>
+</html>

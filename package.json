@@ -1,0 +1,11 @@
+{
+  "name": "sinapseia-landing",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "bun --serve . --port 3000",
+    "build": "bun build src/main.js --outdir dist --minify && bun run copy-assets",
+    "copy-assets": "cp index.html dist/index.html && cp src/style.css dist/style.css",
+    "preview": "bun --serve dist --port 3001"
+  },
+  "devDependencies": {}
+}
